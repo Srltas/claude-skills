@@ -8,6 +8,8 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 |-------|-------------|
 | `skill-create` | Scaffold a new skill in this collection from a workflow you just did |
 | `commit` | Commit staged changes with a clean Conventional Commit subject |
+| `cubrid-manual` | Look up CUBRID engine behavior in the version-pinned online manual |
+| `cmt-manual` | Look up CUBRID Migration Toolkit (CMT) behavior in the online manual |
 
 ## Naming convention
 
