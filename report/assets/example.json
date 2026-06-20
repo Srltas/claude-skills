@@ -1,0 +1,48 @@
+{
+  "title": "CUBRID × Hibernate ORM 검증 보고",
+  "subtitle": "auto_quote_keyword 설정 실측 결과 · CUBRID 11.4 전체 테스트",
+  "meta": "CUBRID Dev1 · 작성일 2026-06-20",
+  "header": "CUBRID × Hibernate ORM 검증 보고 · auto_quote 실측",
+  "auto_number": true,
+  "conclusion": "결론: hibernate.auto_quote_keyword를 켜면 회귀 없이 실패가 **1,540 → 1,260건(-280, -18%)**으로 줄어든다. 방언(dialect)을 마저 고치면 최대 약 **468건**까지 추가 회복이 가능하다.",
+  "blocks": [
+    {"t": "h1", "text": "개요"},
+    {"t": "p", "text": "Hibernate 표준 설정 hibernate.auto_quote_keyword를 켰을 때 CUBRID 호환성이 얼마나 좋아지는지 hibernate-core 전체 테스트로 직접 측정했다."},
+
+    {"t": "h1", "text": "측정 방법"},
+    {"t": "diagram", "direction": "LR", "caption": "그림 1. 측정 흐름", "height_in": 2.4,
+      "nodes": [{"id": "o", "label": "OFF 빌드"}, {"id": "n", "label": "ON 빌드"}, {"id": "d", "label": "델타 분석"}, {"id": "p", "label": "PR 우선순위"}],
+      "edges": [{"from": "o", "to": "d"}, {"from": "n", "to": "d"}, {"from": "d", "to": "p"}]},
+
+    {"t": "h1", "text": "결과 (설정 전/후 비교)"},
+    {"t": "table",
+      "header": ["지표", "설정 전 (OFF)", "설정 후 (ON)", "변화"],
+      "rows": [
+        {"cells": ["전체 실패", "1,540", "1,260", "-280 (-18%)"], "status": "good"},
+        {"cells": ["새로 통과 (복구)", "–", "277", "+277"], "status": "good"},
+        {"cells": ["회귀", "–", "~0", "~0"], "status": "good"}
+      ]},
+    {"t": "chart", "kind": "bar", "title": "전체 실패 테스트", "subtitle": "CUBRID 11.4 · auto_quote_keyword 적용", "caption": "그림 2. 설정 전/후 실패 수", "height_in": 4.0,
+      "bars": [
+        {"label": "설정 전 (OFF)", "value": 1540, "color": "base"},
+        {"label": "설정 후 (ON)", "value": 1260, "color": "good", "badge": "-280\n(-18%)"}
+      ]},
+
+    {"t": "h1", "text": "추가 개선 기회"},
+    {"t": "table",
+      "header": ["영역", "성격", "비고"],
+      "rows": [
+        {"cells": ["식별자·예약어 인용", "설정으로 해소", "본 보고서 (auto_quote ON)"], "status": "good"},
+        {"cells": ["그 외 방언 수정", "PR 필요", "최대 약 468건 회복 여지"], "status": "bad"}
+      ]},
+    {"t": "chart", "kind": "hbar", "title": "방언 수정별 추가 회복 여지", "subtitle": "PR 우선순위 후보", "signed": true, "height_in": 2.6, "caption": "그림 3. 영역별 회복 여지",
+      "bars": [
+        {"label": "bit/binary", "value": 373, "color": "warn", "tag": "PR 필요", "tag_color": "warn"},
+        {"label": "시간값 바인딩", "value": 49, "color": "blue", "tag": "PR 필요", "tag_color": "blue"}
+      ]},
+
+    {"t": "h1", "text": "결론 및 향후 계획"},
+    {"t": "ul", "items": ["auto_quote_keyword는 회귀 없이 호환성을 개선 → **기본 적용** 권고", "다음 단계: 남은 방언 수정 항목 우선순위화 → PR (최대 약 468건 회복 목표)"]},
+    {"t": "note", "text": "본 수치는 **CUBRID 11.4 단일 버전** 기준 — 10.2 등 다른 버전에서 재측정이 필요하다.", "kind": "warn"}
+  ]
+}

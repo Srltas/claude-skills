@@ -10,6 +10,7 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `commit` | Commit staged changes with a clean Conventional Commit subject |
 | `cubrid-manual` | Look up CUBRID engine behavior in the version-pinned online manual |
 | `cmt-manual` | Look up CUBRID Migration Toolkit (CMT) behavior in the online manual |
+| `report` | Generate a CUBRID-house-style Korean analysis report as a Word (.docx) — direct python-docx (cover, auto TOC, color-coded tables) |
 
 ## Naming convention
 
