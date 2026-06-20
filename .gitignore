@@ -1,0 +1,4 @@
+.DS_Store
+.omc/
+.agents/
+node_modules/
