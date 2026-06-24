@@ -35,21 +35,25 @@ def _fmt(v, signed):
     return f"{v:,}"
 
 
+def _text_w_in(s, size_pt):
+    """Rough rendered width of a string in inches (CJK ~1em, Latin ~0.58em)."""
+    return sum((1.0 if ord(c) > 0x2000 else 0.58) * size_pt for c in str(s)) / 72.0
+
+
 def _titles(fig, b):
-    """Title + subtitle, centered over the whole figure (x=0.5 in figure coords)."""
+    """Title + subtitle, centered over the whole figure; inch-based offsets (height-independent)."""
+    fh = fig.get_size_inches()[1]
     title, sub = b.get("title"), b.get("subtitle")
-    if title and sub:
-        fig.text(0.5, 0.975, title, ha="center", va="top", fontsize=16, color=NAVY, fontweight="bold")
-        fig.text(0.5, 0.88, sub, ha="center", va="top", fontsize=11.5, color=SUB)
-    elif title:
-        fig.text(0.5, 0.95, title, ha="center", va="top", fontsize=16, color=NAVY, fontweight="bold")
-    elif sub:
-        fig.text(0.5, 0.95, sub, ha="center", va="top", fontsize=11.5, color=SUB)
+    if title:
+        fig.text(0.5, 1 - 0.30 / fh, title, ha="center", va="top", fontsize=16, color=NAVY, fontweight="bold")
+    if sub:
+        fig.text(0.5, 1 - (0.62 if title else 0.30) / fh, sub, ha="center", va="top", fontsize=11.5, color=SUB)
 
 
 def _footer(fig, b):
     if b.get("note"):
-        fig.text(0.5, 0.04, b["note"], ha="center", va="bottom", fontsize=9.5, color=SUB)
+        fh = fig.get_size_inches()[1]
+        fig.text(0.5, 0.16 / fh, b["note"], ha="center", va="bottom", fontsize=9.5, color=SUB)
 
 
 def _round_bars(ax, fig, radius_in=0.05):
@@ -125,8 +129,15 @@ def render_hbar(b, path):
     vmax = max(values + [1])
     colors = [PAL.get(x.get("color", "good"), PAL["good"]) for x in items]
     signed = b.get("signed", True)
-    fig, ax = plt.subplots(figsize=(b.get("width_in", 6.8), b.get("height_in", 0.95 * n + 1.9)), dpi=150)
-    fig.subplots_adjust(left=0.34, right=0.92, top=0.82, bottom=0.16 if b.get("note") else 0.10)
+    label_w = max([_text_w_in(it.get("label", ""), 13) for it in items] + [0.6])
+    tag_w = max([_text_w_in(it.get("tag", ""), 10) for it in items] + [0.0])
+    left_in = max(label_w, tag_w) + 0.3                 # left margin auto-sized to the longest label
+    plot_in = b.get("plot_in", 5.2)
+    fig_w = left_in + plot_in
+    fig_h = b.get("height_in", 0.95 * n + 1.9)
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=150)
+    fig.subplots_adjust(left=left_in / fig_w, right=0.97,
+                        top=1 - 0.80 / fig_h, bottom=(0.5 if b.get("note") else 0.2) / fig_h)
     ys = list(range(n))[::-1]
     ax.barh(ys, values, height=0.5, color=colors, zorder=3)
     ax.set_xlim(0, vmax * 1.16)
