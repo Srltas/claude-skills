@@ -13,6 +13,7 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `report` | Generate a CUBRID-house-style Korean analysis report as a Word (.docx) — docx-js + matplotlib charts, OOXML-validated |
 | `hhh-dialect-verify` | Run the hibernate-core suite against CUBRID, diff pass/fail vs a baseline, classify failures by family |
 | `hhh-dialect-verify-report` | One-shot: run the suite (one/all CUBRID versions) → diff vs a baseline → always write the .docx report |
+| `jdbc-ctp-verify-report` | One-shot: build the CUBRID JDBC driver → run the CTP suite → diff vs a baseline → classify → always write the .docx report |
 
 ## Naming convention
 
