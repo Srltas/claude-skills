@@ -64,3 +64,16 @@ Failures that pass on isolated rerun = **flaky** → exclude from the regression
 ## Step 8 — Summarize / hand to the report skill
 
 State: total OFF→ON, **+N recovered / −N regressed**, net, and the top failure families. To produce the Word report, feed these to the **report** skill as a 비교 분석 — a 전/후 comparison table + a bar chart (failures before→after) + an `hbar` of recovered-by-family.
+
+## Step 9 - Tear down (free disk)
+
+The CUBRID container holds a **~2.7 GB anonymous data volume**, and `db.sh`'s built-in `compose_down` is a **no-op unless `REMOVE_ORPHANS` is set** — so re-running Step 2 for a new image/version orphans the old volume and the disk fills up over repeated runs. Always tear down when finished:
+
+```bash
+docker compose -p hibernate_orm \
+  -f ~/Devel/hibernate/docker-compose/latest/cubrid/docker-compose.yaml down -v
+# sweep stragglers from earlier runs (anonymous = 64-hex; named volumes like jenkins are kept):
+docker volume ls -qf dangling=true | grep -E '^[0-9a-f]{64}$' | xargs -r docker volume rm
+```
+
+(The `hhh-dialect-verify-report` orchestrator does this automatically after every version.)

@@ -21,6 +21,7 @@ CONF=""
 OUT="./ctp-out"
 BASELINE=""
 NO_BUILD=0
+CLEANUP=1
 PARSE="${PARSE_CTP:-$HOME/.claude/skills/jdbc-ctp-verify-report/assets/parse_ctp.py}"
 
 while [ $# -gt 0 ]; do
@@ -31,6 +32,7 @@ while [ $# -gt 0 ]; do
     --cubrid) CUBRID_DIR="$2"; shift 2;;
     --conf) CONF="$2"; shift 2;;
     --no-build) NO_BUILD=1; shift;;
+    --no-cleanup) CLEANUP=0; shift;;
     --out) OUT="$2"; shift 2;;
     *) echo "unknown arg: $1" >&2; exit 2;;
   esac
@@ -41,6 +43,21 @@ done
 [ -n "$CUBRID_DIR" ] || { echo "ERROR: CUBRID install dir unknown — set \$CUBRID or pass --cubrid" >&2; exit 2; }
 CONF="${CONF:-$CTP_HOME/conf/jdbc.conf}"
 mkdir -p "$OUT"
+
+# --- self-cleanup: on exit, prune orphaned anonymous CUBRID test-DB volumes left behind
+#     by recreated containers (dangling=true skips volumes attached to any running OR
+#     stopped container; the 64-hex filter preserves named volumes like jenkins_jenkins-data).
+#     Disable with --no-cleanup.
+CLI="$(command -v docker || command -v podman || echo docker)"
+cleanup_orphans() {
+  [ "$CLEANUP" -eq 1 ] || return 0
+  local vols
+  vols="$("$CLI" volume ls -qf dangling=true 2>/dev/null | grep -E '^[0-9a-f]{64}$' || true)"
+  [ -n "$vols" ] || return 0
+  echo "cleanup: removing $(printf '%s\n' "$vols" | wc -l | tr -d ' ') orphaned anonymous volume(s)"
+  printf '%s\n' "$vols" | xargs -r "$CLI" volume rm >/dev/null 2>&1 || true
+}
+trap cleanup_orphans EXIT
 
 # --- 1. build the driver ---
 if [ "$NO_BUILD" -eq 0 ]; then

@@ -27,6 +27,8 @@ Per version it starts CUBRID (`CUBRID_IMAGE=...:<v> ./db.sh cubrid`), runs `:hib
 
 The baseline may be a `.tgz`, a `test-results/test` dir, or a `*.json` from a prior `parse`. For accurate per-version deltas the baseline should correspond to the version(s) compared.
 
+After each version the script **tears the CUBRID container down with its anonymous data volume** (`down -v`) before the next version, so the disk doesn't fill up across the matrix (each version's volume is ~2.7 GB). Pass `--no-cleanup` to keep the DB running for debugging.
+
 ## Step 2 — Read the summary
 
 Read `verify-out/summary.json` → `{ baseline_failed, versions: [{version, total, passed, failed, skipped, recovered, regressed, net, families, recovered_by_family, regressed_by_family}] }`.

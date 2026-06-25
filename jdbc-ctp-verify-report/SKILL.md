@@ -28,6 +28,8 @@ The **change under test** is in the working tree — a driver code change, or a 
 
 (Baseline may be a `.json` from a prior `parse`, a CTP `current_runtime_logs` dir, or a `test-jdbc.xml`. CTP also writes `test_status.data` with `total_*_case_count` for a quick sanity count.)
 
+On exit the script **prunes orphaned anonymous CUBRID test-DB volumes** (those attached to no container; named volumes like `jenkins_jenkins-data` are preserved) so leftover test databases don't accumulate. Pass `--no-cleanup` to skip.
+
 ## Step 2 — Read the diff/summary
 From `ctp-out/diff.txt` + `after.json`: total/passed/failed, **+N recovered / −N regressed**, and the regressed cases by family (verify-error, conversion, broker/env, classpath/compat, NPE, …).
 

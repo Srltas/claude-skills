@@ -21,6 +21,7 @@ VERSIONS="11.4"
 BASELINE=""
 TESTS=""
 SKIP_RUN=0
+CLEANUP=1
 PARSE="${PARSE_RESULTS:-$HOME/.claude/skills/hhh-dialect-verify/assets/parse_results.py}"
 
 while [ $# -gt 0 ]; do
@@ -32,6 +33,7 @@ while [ $# -gt 0 ]; do
     --repo) REPO="$2"; shift 2;;
     --out) OUT="$2"; shift 2;;
     --skip-run) SKIP_RUN=1; shift;;
+    --no-cleanup) CLEANUP=0; shift;;
     *) echo "unknown arg: $1" >&2; exit 2;;
   esac
 done
@@ -40,6 +42,20 @@ done
 [ -f "$PARSE" ] || { echo "ERROR: parse_results.py not found at $PARSE (install hhh-dialect-verify, or set PARSE_RESULTS)" >&2; exit 2; }
 mkdir -p "$OUT"
 RESULTS_DIR="$REPO/hibernate-core/target/test-results/test"
+
+# --- self-cleanup: tear down the CUBRID container this run started, removing its
+#     anonymous data volume (down -v). db.sh's compose_down is a no-op unless
+#     REMOVE_ORPHANS is set, so without this each version leaves a ~2.7GB orphaned
+#     volume behind and the disk fills up over repeated runs. Disable with --no-cleanup.
+CLI="$(command -v docker || command -v podman || echo docker)"
+COMPOSE_FILE="$REPO/docker-compose/latest/cubrid/docker-compose.yaml"
+cleanup_cubrid() {
+  [ "$CLEANUP" -eq 1 ] || return 0
+  "$CLI" compose -p hibernate_orm -f "$COMPOSE_FILE" down -v >/dev/null 2>&1 || true
+  "$CLI" rm -f -v cubrid >/dev/null 2>&1 || true
+}
+# tear down even on error/interrupt — we own the container we started
+[ "$SKIP_RUN" -eq 0 ] && [ "$CLEANUP" -eq 1 ] && trap cleanup_cubrid EXIT
 
 # --- resolve baseline -> $OUT/baseline.json ---
 case "$BASELINE" in
@@ -63,6 +79,7 @@ for v in "${VLIST[@]}"; do
     CUBRID_IMAGE="docker.io/cubrid/cubrid:$v" "$REPO/db.sh" cubrid
     ( cd "$REPO" && ./gradlew :hibernate-core:test -Pdb=cubrid -Plog-test-progress=true --stacktrace --no-daemon \
         ${TESTS:+--tests "$TESTS"} ) 2>&1 | tee "$OUT/run-$v.log" || true
+    cleanup_cubrid   # remove this version's container + anon volume before the next version
   fi
   python3 "$PARSE" parse "$RESULTS_DIR" "$OUT/$v.json"
   SUMARGS+=("$v=$OUT/$v.json")
