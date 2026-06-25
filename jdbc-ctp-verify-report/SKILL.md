@@ -39,7 +39,7 @@ Turn the numbers into a `report` JSON spec (비교 분석):
 - **결과** section: a `table` (총 케이스 · 성공 · 실패 · +recovered · −regressed) with `status` colors + a `bar` chart (failed before→after, `-N` badge).
 - **깨진 케이스 분류** section: an `hbar` of failures-by-family (e.g. verify-error N).
 - **회귀** section: if regressed, a `note` (warn) + the case list; else "회귀 ~0".
-Follow the report skill's schema + 작성 원칙. Default `meta` = `작성자/팀 · 작성일`.
+Follow the report skill's schema + 작성 원칙. Default `meta` = `CUBRID Dev1 · 작성일 <date>` (author = `CUBRID Dev1` unless the user names another).
 
 ## Step 4 — Generate, validate, verify (MANDATORY)
 ```bash

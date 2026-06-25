@@ -36,7 +36,7 @@ The document is assembled with **docx-js**; `chart`/`diagram` blocks are rendere
 | 비교 분석 | 기준/대상 → 항목별 비교표 → 권고 |
 | 조사/현황 | 개요 → 방법 → 결과(표) → 해석 → 다음 단계 |
 
-Collect (ask only for what is missing): title, subtitle (scope/version), meta (author/team · date), the headline conclusion, body content, and table data.
+Collect (ask only for what is missing): title, subtitle (scope/version), meta (author/team · date — **author defaults to `CUBRID Dev1`**; do not ask for it unless the user names a different author), the headline conclusion, body content, and table data.
 
 ## 작성 원칙 — write less, show more
 
@@ -51,7 +51,7 @@ Optimize for a reader who skims. Keep prose minimal and let structure carry the 
 
 Write `<topic>.json`. See `assets/example.json` for a complete example. Schema:
 
-- `title`, `subtitle`, `meta` (`작성자/팀 · 작성일 YYYY-MM-DD` — author/team + date **only**; no org name, scope, or version on this line — those go in the subtitle or 부록), `conclusion` (bold cover abstract), `header` (optional; defaults to title), `auto_number` (optional: `true` → h1 sections auto-numbered `1.`, `2.`, … and TOC stays in sync; then give h1 bare titles without numbers).
+- `title`, `subtitle`, `meta` (`작성자/팀 · 작성일 YYYY-MM-DD` — author/team + date **only**; **author defaults to `CUBRID Dev1`** unless the user specifies another; no org name, scope, or version on this line — those go in the subtitle or 부록), `conclusion` (bold cover abstract), `header` (optional; defaults to title), `auto_number` (optional: `true` → h1 sections auto-numbered `1.`, `2.`, … and TOC stays in sync; then give h1 bare titles without numbers).
 - `blocks`: an ordered list of:
   - `{"t":"h1","text":"1. 개요"}` — numbered section (TOC auto-built from these; number them `1.`, `2.`, …)
   - `{"t":"h2","text":"6.1 …"}` — subsection

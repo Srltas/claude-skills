@@ -42,7 +42,7 @@ Turn `summary.json` into a `report` JSON spec (a 비교 분석), using the real 
 - **실패 분류** section: an `hbar` of recovered-by-family (and/or top remaining families).
 - **회귀** section: if any `regressed`, a `note` (warn) + the regressed test list; else state "회귀 ~0".
 
-Follow the report skill's schema + 작성 원칙 (간결, 표/차트 우선). Default `meta` = `작성자/팀 · 작성일`.
+Follow the report skill's schema + 작성 원칙 (간결, 표/차트 우선). Default `meta` = `CUBRID Dev1 · 작성일 <date>` (author = `CUBRID Dev1` unless the user names another).
 
 ## Step 4 — Generate, validate, visually verify (MANDATORY)
 
