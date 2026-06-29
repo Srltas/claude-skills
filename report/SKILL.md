@@ -88,10 +88,13 @@ NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin
 "$VENV/bin/python" <docx-skill>/scripts/office/validate.py <output>.docx   # expect "All validations PASSED!"
 ```
 
-**2) Visual verification** — render every page to an image and read them, to catch layout issues the schema can't:
+**2) Visual verification** — render every page to an image and read them, to catch layout issues the schema can't (clipped chart labels, overlapping text, a `note` box merging into a table, broken page breaks, color/table problems). This is the PRIMARY defect-catcher; schema validation cannot see any of these. **Do not skip it whenever `soffice` resolves** — only skip if LibreOffice is genuinely absent (and then say so explicitly).
 
 ```bash
-SOFFICE="/Applications/LibreOffice.app/Contents/MacOS/soffice"   # one-time: brew install --cask libreoffice
+# Resolve LibreOffice robustly: PATH first (brew/linux), then the macOS .app bundle.
+SOFFICE="$(command -v soffice || command -v libreoffice || true)"
+[ -z "$SOFFICE" ] && [ -x "/Applications/LibreOffice.app/Contents/MacOS/soffice" ] && SOFFICE="/Applications/LibreOffice.app/Contents/MacOS/soffice"
+# if still empty -> install once: brew install --cask libreoffice  (mac) | sudo apt-get install -y libreoffice  (linux)
 "$SOFFICE" --headless -env:UserInstallation=file:///tmp/loprofile --convert-to pdf --outdir /tmp/render <output>.docx
 pdftoppm -png -r 120 "/tmp/render/$(basename <output>.docx .docx).pdf" /tmp/render/page
 # then Read /tmp/render/page-*.png and check cover, TOC, tables, charts, page breaks
