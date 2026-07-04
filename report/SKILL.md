@@ -63,12 +63,25 @@ Write `<topic>.json`. See `assets/example.json` for a complete example. Schema:
   - `{"t":"chart","kind":"bar","title":"…","subtitle":"…","note":"하단 주석","signed":false,"bars":[{"label":"…","value":N,"color":"base|blue|good|lightgreen|warn|bad","badge":"강조\n둘째 줄","note":"바 위 메모"}]}` — vertical bars: bold-navy value labels, optional pill `badge` / colored `note` above a bar, subtle baseline (house style, no axes/grid)
   - `{"t":"chart","kind":"hbar","title":"…","subtitle":"…","note":"…","bars":[{"label":"…","value":N,"color":"…","tag":"유지","tag_color":"good"}]}` — horizontal ranked bars: label left (+ optional colored `tag`), proportional bar, bold-navy value at the end. Best for ranking magnitudes (`signed` defaults true)
   - For trends or share: `{"t":"chart","kind":"line|pie","labels":[…],"series":[{"name":"…","data":[…]}]}`
-  - `{"t":"diagram","direction":"LR|TB","nodes":[{"id":"a","label":"증상"}, …],"edges":[{"from":"a","to":"b","label":"원인"}, …],"caption":"그림 2"}` — flow / architecture diagram auto-rendered to an image
+  - `{"t":"svg","code":"<svg …>…</svg>","caption":"그림 2","width_in":6.4}` — **hand-authored SVG diagram — PREFER THIS for every 도식/그림 (flow, architecture, state, sequence).** Authored like a visualize widget, embedded as a native vector image in Word (crisp, zero glyph/shape overlap) with an auto-generated PNG fallback. Follow the **SVG 도식 작성 규칙** below. (Needs LibreOffice for the fallback.)
+  - `{"t":"diagram","direction":"LR|TB","nodes":[…],"edges":[…],"caption":"그림 2"}` — *(legacy)* matplotlib auto-layout flow; prone to text/shape overlap and stiff shapes. **Do not use for new reports — author an `svg` block instead.**
   - `{"t":"code","text":"..."}` — monospace block (Consolas on light-gray)
   - `{"t":"pagebreak"}` — force a page break (cover→목차→본문 breaks are automatic)
 - Table `status` per row: `good` = green (pass), `bad` = red (fail), `warn` = gray, omitted = neutral. The header row is auto sky-blue and repeats across page breaks.
 
 Follow the type skeleton from Step 1 and the 작성 원칙 above. Language: Korean, plain and direct.
+
+### SVG 도식 작성 규칙 (the `svg` block)
+
+Author the SVG yourself, the way the `visualize` tool would — deliberate layout, not auto-placed. These rules keep it on-brand and prevent the overlap/distortion that the old matplotlib `diagram` produced:
+
+- **Canvas**: set `viewBox="0 0 W H"` (this fixes the aspect ratio; `width_in` sizes it in the doc). No pixel `width`/`height` needed.
+- **Font**: put `font-family="'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo',sans-serif"` on every `<text>`; titles `font-weight="bold"`.
+- **Palette (match the report)**: text/heading navy `#1F3864`; strokes & arrows blue `#2E6DA4`, good `#2EA84F`, bad `#C0392B`, warn `#E8862E`; light box fills `#EAF1F8` (blue) / `#E2EFDA` (good) / `#F8D7DA` (bad) / `#FFF2CC` (warn); plain boxes on white.
+- **Boxes**: rounded `rx="9"`, `stroke-width="2"`. Size each box to its text — roughly `width ≈ 9px × 글자수 + 32`, `height ≥ 48`. Center the label with `text-anchor="middle"` and baseline ≈ box-center-y + 5.
+- **Arrows**: draw **edge-to-edge** (start on the source box border, end on the target border — never center-to-center), `stroke-width="2"`, end with a `<marker>` arrowhead colored like the line. Put an edge label at the segment midpoint in the matching color.
+- **Spacing**: leave ≥ 24px between boxes; never let text touch or overlap a border or another shape.
+- **Scope**: use SVG for schematic diagrams (boxes + arrows + short labels). For quantitative comparison/trend/share, use a `chart` block, not SVG.
 
 ## Step 3 — Generate the .docx
 
@@ -77,7 +90,7 @@ NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin
   node "<skill-base-dir>/assets/build_report.js" <topic>.json <output>.docx
 ```
 
-`<skill-base-dir>` is this skill's own directory (shown as its base directory when the skill runs). `build_report.js` calls `figures.py` for any `chart`/`diagram` blocks. Filename convention: `CUBRID_<주제>_<유형>_YYYYMMDD.docx`.
+`<skill-base-dir>` is this skill's own directory (shown as its base directory when the skill runs). `build_report.js` calls `figures.py` for `chart`/`diagram` blocks (matplotlib), and rasterizes each `svg` block's PNG fallback via LibreOffice (`soffice`, resolved on PATH → macOS app bundle). Filename convention: `CUBRID_<주제>_<유형>_YYYYMMDD.docx`.
 
 ## Step 4 — Validate, visually verify, hand off
 

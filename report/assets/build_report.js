@@ -65,6 +65,63 @@ function figure(block) {
   return out;
 }
 
+/* ---- SVG figures: Claude-authored SVG → native docx SVG (crisp in Word) + soffice PNG fallback ---- */
+function findSoffice() {
+  for (const d of (process.env.PATH || "").split(path.delimiter)) {
+    for (const nm of ["soffice", "libreoffice"]) { const p = path.join(d, nm); if (fs.existsSync(p)) return p; }
+  }
+  const app = "/Applications/LibreOffice.app/Contents/MacOS/soffice";
+  return fs.existsSync(app) ? app : null;
+}
+
+function svgAspect(svg) {
+  const vb = svg.match(/viewBox\s*=\s*["']\s*[-\d.]+[ ,]+[-\d.]+[ ,]+([\d.]+)[ ,]+([\d.]+)/i);
+  if (vb) return [parseFloat(vb[1]), parseFloat(vb[2])];
+  const w = svg.match(/\bwidth\s*=\s*["']([\d.]+)/i), h = svg.match(/\bheight\s*=\s*["']([\d.]+)/i);
+  if (w && h) return [parseFloat(w[1]), parseFloat(h[1])];
+  return [640, 400];
+}
+
+// force root <svg> width/height (px) for a crisp raster, keeping viewBox
+function svgAtSize(svg, wPx, hPx) {
+  return svg.replace(/<svg\b([^>]*)>/i, (_, attrs) =>
+    `<svg${attrs.replace(/\s(width|height)\s*=\s*["'][^"']*["']/gi, "")} width="${wPx}" height="${hPx}">`);
+}
+
+function rasterizeSvg(svgHiRes) {
+  const soffice = findSoffice();
+  if (!soffice) return null;
+  const base = `svg_${process.pid}_${tmpFiles.length}`;
+  const sPath = path.join(os.tmpdir(), base + ".svg");
+  fs.writeFileSync(sPath, svgHiRes); tmpFiles.push(sPath);
+  execFileSync(soffice, ["--headless", "-env:UserInstallation=file://" + path.join(os.tmpdir(), "loprofile_report"),
+    "--convert-to", "png", "--outdir", os.tmpdir(), sPath], { stdio: "ignore" });
+  const pPath = path.join(os.tmpdir(), base + ".png");
+  if (!fs.existsSync(pPath)) return null;
+  tmpFiles.push(pPath);
+  return fs.readFileSync(pPath);
+}
+
+/* An `svg` block: {t:"svg", code:"<svg…>…</svg>", caption?, width_in?} */
+function svgFigure(block) {
+  const svg = block.code;
+  if (!svg || !/<svg[\s>]/i.test(svg)) throw new Error("svg block: `code` must be an <svg> document");
+  const [aw, ah] = svgAspect(svg);
+  const wPx = Math.round((block.width_in || 6.4) * 96);
+  const hPx = Math.round(wPx * ah / aw);
+  const png = rasterizeSvg(svgAtSize(svg, wPx * 2, hPx * 2));
+  if (!png) throw new Error("svg block needs LibreOffice (soffice) for the PNG fallback — none found. brew install --cask libreoffice");
+  const out = [new Paragraph({
+    alignment: AlignmentType.CENTER, spacing: { before: 60, after: 60 },
+    children: [new ImageRun({ type: "svg", data: Buffer.from(svg, "utf-8"), transformation: { width: wPx, height: hPx }, fallback: { type: "png", data: png } })],
+  })];
+  if (block.caption) out.push(new Paragraph({
+    alignment: AlignmentType.CENTER, spacing: { after: 120 },
+    children: [new TextRun({ text: block.caption, italics: true, size: 18, color: GRAY, font: FONT })],
+  }));
+  return out;
+}
+
 function heading(text, level) {
   return new Paragraph({
     spacing: level === 1 ? { before: 320, after: 160 } : { before: 220, after: 120 },
@@ -168,6 +225,7 @@ spec.blocks.forEach((b, i) => {
     case "code": children.push(codeBlock(b.text)); break;
     case "note": children.push(noteBox(b.text, b.kind || "info"), new Paragraph({})); break;
     case "chart": case "diagram": for (const p of figure(b)) children.push(p); break;
+    case "svg": for (const p of svgFigure(b)) children.push(p); break;
     case "pagebreak": children.push(new Paragraph({ children: [new PageBreak()] })); break;
     case "table": children.push(table(b), new Paragraph({})); break;   // spacer: keep tables from merging
   }
