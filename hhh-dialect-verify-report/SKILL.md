@@ -14,6 +14,7 @@ Run the hibernate-core suite against CUBRID (one version or the full matrix), di
 
 - Installed skills: **`hhh-dialect-verify`** and **`report`** (both under `~/.claude/skills/`).
 - Hibernate repo (default `~/Devel/hibernate`), Docker, `python3`, and for the report: `node` + global `docx`, plus the report venv (matplotlib). See the report skill's Step 0.
+- Optional: the **Understand-Anything** plugin (`/understand-*` commands). If installed, Step 3 can add a change-impact (영향 범위) note; the pipeline runs fine without it.
 
 ## Step 1 — Run the orchestrator (verify across versions)
 
@@ -41,6 +42,7 @@ Turn `summary.json` into a `report` JSON spec (a 비교 분석), using the real 
 - **결과** section: a `table` of version × (failed, +recovered, −regressed, net) with row `status` colors, plus a `bar`/`hbar` chart (failed-per-version for `--all-versions`, or before→after with a `-N` badge for a single version).
 - **실패 분류** section: an `hbar` of recovered-by-family (and/or top remaining families).
 - **회귀** section: if any `regressed`, a `note` (warn) + the regressed test list; else state "회귀 ~0".
+- **영향 범위** (선택 — only if the **Understand-Anything** plugin is installed): to complement the quantitative +N/−N deltas with the change's blast radius, run `/understand-diff` (for uncommitted changes) or `/understand-explain` on the dialect files, and fold the result into a short `note` or an "영향" subsection. If the plugin is not installed, skip this — the rest of the report is unchanged.
 
 Follow the report skill's schema + 작성 원칙 (간결, 표/차트 우선). Default `meta` = `CUBRID Dev1 · 작성일 <date>` (author = `CUBRID Dev1` unless the user names another).
 
