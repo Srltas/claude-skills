@@ -15,6 +15,7 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `hhh-dialect-verify-report` | One-shot: run the suite (one/all CUBRID versions) → diff vs a baseline → always write the .docx report |
 | `jdbc-ctp-verify-report` | One-shot: build the CUBRID JDBC driver → run the CTP suite → diff vs a baseline → classify → always write the .docx report |
 | `jira-fetch` | Download a Jira Server issue (e.g. CUBRID CBRD) to a local Markdown file and load it as working context (wraps `Srltas/jira-to-md-downloader`; Atlassian Cloud not supported as-is) |
+| `worklog` | Record issue work as a Markdown note in your public `work-docs` repo (`<tracker>-XXXXX/<KEY>-<slug>.md`), a shareable PR-linkable trail that complements the internal master DOCX |
 
 ## Naming convention
 
