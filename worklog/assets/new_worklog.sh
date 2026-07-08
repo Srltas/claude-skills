@@ -20,7 +20,7 @@ if printf '%s' "$KEY" | grep -qiE "${key_re}(-.*)?$"; then
   keypart="$(printf '%s' "$KEY" | grep -oiE "$key_re" | head -1)"
   tail="${KEY#"$keypart"}"                                         # '' or '-slug'
   title="$(printf '%s' "$keypart" | tr '[:lower:]' '[:upper:]')"   # CBRD-1234
-  folder="$(printf '%s' "$keypart" | tr '[:upper:]' '[:lower:]')"  # cbrd-1234
+  folder="$title"                                                  # CBRD-1234 (folder key also uppercase)
   name="$title$tail"
   [ -n "$SLUG" ] && name="$name-$SLUG"
 else
