@@ -10,7 +10,7 @@ Publish a per-issue work record to your **public** `work-docs` repo, so the reas
 
 ## Step 0 — Prereqs
 
-- The docs repo cloned locally at `${WORKLOG_DOCS_REPO:-$HOME/Devel/work-docs}`, with its `origin` set to your public repo (e.g. `github.com/Srltas/work-docs`). Override the path with `WORKLOG_DOCS_REPO`.
+- The docs repo cloned locally at `${WORK_DOCS_REPO:-$HOME/Devel/work-docs}`, with its `origin` set to your public repo (e.g. `github.com/Srltas/work-docs`). Override the path with `WORK_DOCS_REPO` (the legacy `WORKLOG_DOCS_REPO` also works). Shared with the `note` skill.
 - Optional: the **jira-fetch** skill, to pull issue context (CBRD only; Hibernate HHH is Atlassian Cloud, not supported by that tool).
 
 ## Step 1 — Identify the record
@@ -44,7 +44,7 @@ Edit the created file, completing each section (배경/이슈, 원인 분석 AS-
 ## Step 5 — Commit (never push)
 
 ```bash
-REPO="${WORKLOG_DOCS_REPO:-$HOME/Devel/work-docs}"
+REPO="${WORK_DOCS_REPO:-$HOME/Devel/work-docs}"
 git -C "$REPO" add "<folder>/<name>.md"
 git -C "$REPO" commit -m "docs(<key>): <short summary>"
 ```

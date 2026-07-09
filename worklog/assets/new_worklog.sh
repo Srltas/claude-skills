@@ -4,7 +4,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-REPO="${WORKLOG_DOCS_REPO:-$HOME/Devel/work-docs}"
+REPO="${WORK_DOCS_REPO:-${WORKLOG_DOCS_REPO:-$HOME/Devel/work-docs}}"
 TEMPLATE="$HERE/worklog-template.md"
 
 KEY="${1:?usage: new_worklog.sh <ISSUE-KEY|topic> [slug]}"
