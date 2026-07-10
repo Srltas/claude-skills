@@ -1,12 +1,12 @@
 ---
 name: jira-draft
-description: "Draft a CUBRID JIRA issue (bug or task) with a concise English title and a Korean, bullet-style (개조식) body under English section headers. Use when you need to write up a CUBRID JIRA issue from the current work: a bug report (Description / Test Build / Repro / Expected / Actual / Additional Info) or a task/improvement (Description / Specification Changes / Implementation / Acceptance Criteria / Definition of Done). Produces a copy-paste draft only; it does not post to JIRA. It is the reverse of jira-fetch (which downloads an issue). Triggers on phrases like 'CUBRID JIRA 이슈 작성', 'jira 버그 리포트 초안', '이 작업 jira 이슈로 정리', 'draft a CUBRID jira issue', 'write a jira bug report'."
+description: "Draft a CUBRID JIRA issue (bug or task) with a concise English title and a Korean body under English section headers (Description as easy-to-read prose; the other sections in bullet style, 개조식). Use when you need to write up a CUBRID JIRA issue from the current work: a bug report (Description / Test Build / Repro / Expected / Actual / Additional Info) or a task/improvement (Description / Specification Changes / Implementation / Acceptance Criteria / Definition of Done). Produces a copy-paste draft only; it does not post to JIRA. It is the reverse of jira-fetch (which downloads an issue). Triggers on phrases like 'CUBRID JIRA 이슈 작성', 'jira 버그 리포트 초안', '이 작업 jira 이슈로 정리', 'draft a CUBRID jira issue', 'write a jira bug report'."
 argument-hint: "bug|task [subject]"
 ---
 
 # Draft a CUBRID JIRA issue
 
-Write a ready-to-paste CUBRID JIRA issue from the current work. **Title in concise English; body in Korean, 개조식 (bullet points, 핵심만); section headers in English.** This produces a draft only. You paste it into JIRA; the skill does not post.
+Write a ready-to-paste CUBRID JIRA issue from the current work. **Title in concise English; section headers in English; body in Korean.** The **Description** reads as plain, easy-to-understand prose (a reader new to the issue should get it); the **other sections are 개조식** (bullet points, 핵심만). This produces a draft only. You paste it into JIRA; the skill does not post.
 
 ## Step 1 — Pick the type
 
@@ -34,7 +34,7 @@ Do not invent. If a field is unknown, write `(확인 필요)` rather than guessi
 
 ```markdown
 ## Description
-- 무엇이 문제인지 한두 줄
+처음 보는 사람도 이해할 수 있게 문제 상황을 서술체로 설명 (한두 문단)
 ## Test Build
 - 빌드/버전/브랜치 (예: 11.3 latest, commit abc123)
 ## Repro
@@ -52,7 +52,7 @@ Do not invent. If a field is unknown, write `(확인 필요)` rather than guessi
 
 ```markdown
 ## Description
-- 무엇을, 왜
+이 작업이 무엇이고 왜 필요한지 서술체로 설명 (한두 문단)
 ## Specification Changes
 - 사양 변경점 (없으면 "없음")
 ## Implementation
@@ -63,7 +63,7 @@ Do not invent. If a field is unknown, write `(확인 필요)` rather than guessi
 - 코드 / 테스트 / 문서 등 완료 기준
 ```
 
-Rules: 개조식 불릿, 한 항목 한 줄, 핵심만. 빈 섹션은 생략하지 말고 `없음` 또는 `(확인 필요)`로 남긴다 (`Additional Information`만 정보 없으면 생략 가능).
+Rules: **Description은 서술체**(읽는 사람이 이해하기 쉽게, 한두 문단), **그 외 섹션은 개조식**(한 항목 한 줄, 핵심만). 빈 섹션은 생략하지 말고 `없음` 또는 `(확인 필요)`로 남긴다 (`Additional Information`만 정보 없으면 생략 가능).
 
 ## Step 4 — Output
 
