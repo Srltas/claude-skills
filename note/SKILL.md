@@ -37,7 +37,11 @@ Record what you consulted (manual URLs, graph, issue keys) in the 참고 section
 
 ## Step 4 — Fill it in
 
-Complete each section: 목적 / 배경 / 범위·방법 / 발견·관찰 / 결론 / 다음 단계(이슈화 여부) / 참고. Lead with the outcome and keep it tight.
+Complete each section: 요약 / 목적 / 배경 / 범위·방법 / 발견·관찰 / 결론 / 다음 단계(이슈화 여부) / 참고. Detailed but **easy to skim**:
+
+- **`## 요약` first, in one line** (핵심 결론/발견).
+- 목적·배경·결론은 2~3문장 짧은 서술, 방법·발견·다음 단계의 나열은 **개조식 불릿**.
+- 데이터·비교·수치는 **표**로, 코드·SQL·로그는 **코드블록**으로 (문장으로 풀지 않기).
 
 **The repo is PUBLIC**: no credentials, internal hostnames, local absolute paths, or internal-only analysis. Keep sensitive detail in the master DOCX and link out.
 

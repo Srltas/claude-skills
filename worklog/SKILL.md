@@ -37,7 +37,11 @@ Creates `<KEY>/<KEY>-<slug>.md` from the template (refuses to overwrite an exist
 
 ## Step 4 — Fill it in
 
-Edit the created file, completing each section (배경/이슈, 원인 분석 AS-IS, 변경/해결 TO-BE, 검증 with real numbers, 결과/영향, 참고 links). Keep prose tight and lead with the outcome.
+Edit the created file, completing each section (요약, 배경/이슈, 원인 분석 AS-IS, 변경/해결 TO-BE, 검증 with real numbers, 결과/영향, 참고 links). Detailed but **easy to skim**:
+
+- **`## 요약` first, in one line** (무엇을 했고 결과가 뭔지).
+- 배경·결론은 2~3문장 짧은 서술, 원인·변경·검증·결과의 나열은 **개조식 불릿**.
+- before/after·수치는 **표**로, 코드·SQL·로그는 **코드블록**으로 (문장으로 풀지 않기).
 
 **This repo is PUBLIC**: do not include credentials, internal hostnames, local absolute paths, or internal-only analysis. Anything sensitive stays in the master DOCX; link to the JIRA/PR instead.
 
