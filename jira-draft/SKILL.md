@@ -63,7 +63,7 @@ Do not invent. If a field is unknown, write `(확인 필요)` rather than guessi
 - 코드 / 테스트 / 문서 등 완료 기준
 ```
 
-Rules: **Description은 서술체**(읽는 사람이 이해하기 쉽게, 한두 문단), **그 외 섹션은 개조식**(한 항목 한 줄, 핵심만). 빈 섹션은 생략하지 말고 `없음` 또는 `(확인 필요)`로 남긴다 (`Additional Information`만 정보 없으면 생략 가능).
+Rules: **Description은 서술체**(읽는 사람이 이해하기 쉽게, 한두 문단), **그 외 섹션은 개조식**(한 항목 한 줄, 핵심만). 빈 섹션은 생략하지 말고 `없음` 또는 `(확인 필요)`로 남긴다 (`Additional Information`만 정보 없으면 생략 가능). em-dash(`—`)는 쓰지 않는다: 쉼표·콜론·괄호·마침표로 대체.
 
 ## Step 4 — Output
 

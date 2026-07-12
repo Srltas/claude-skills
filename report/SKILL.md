@@ -46,6 +46,7 @@ Optimize for a reader who skims. Keep prose minimal and let structure carry the 
 - **Core points only** — short sentences, one idea per bullet; cut background the reader can infer.
 - **Prefer tables / charts / figures over paragraphs** — turn comparisons, metrics, and status into a color-coded `table`; turn trends or distributions into a chart embedded via an `image`; use a `note` box for the single most important caveat. Reserve `p` paragraphs for the few sentences that truly need prose.
 - **Emphasize only the few key terms** with `**…**` so the eye lands on them.
+- **No em-dash**: never use the `—` character in the document; use commas, colons, parentheses, or periods instead.
 
 ## Step 2 — Write the JSON spec
 
