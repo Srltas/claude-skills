@@ -37,6 +37,8 @@ Good: `feat(commit): add conventional-commit skill`, `fix: handle empty staged d
 
 Avoid: vague summaries ("update stuff"), past tense ("added"), a capitalized or period-ended summary, or stacking multiple unrelated changes into one subject.
 
+**No issue-key prefix**: never prepend a JIRA/issue key such as `[CUBRIDQA-1432]` or `[CBRD-1234]` to the subject, even if the repo's existing commit history uses that style. Always keep the Conventional Commit form `type(scope): summary` (`fix: …`, `refactor: …`, `ci: …`). If the commit relates to an issue, put the reference in the body or a trailer, not the subject.
+
 If `$ARGUMENTS` is given, treat it as a hint for the scope or wording — still normalize it to the format above.
 
 ## Step 4 — Confirm and commit
