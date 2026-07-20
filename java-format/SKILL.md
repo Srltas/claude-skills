@@ -1,7 +1,7 @@
 ---
 name: java-format
 description: "Apply google-java-format (AOSP style, in place) to Java files: the changed files, the staged files, all files, or specific paths. It asks which google-java-format version to use (e.g. 1.7 or 1.32.0), resolves the jar (GJF_JAR, then $GJF_DIR if set, then a cache, else auto-downloads that version), and runs it. Use when you want to format Java code to the project style, before committing. Triggers on phrases like 'google-java-format 적용', '자바 코드 스타일 적용', '변경된 자바 포맷', 'format the java files', 'apply java formatting'."
-argument-hint: "<changed|staged|all|FILE...> [--version X]"
+argument-hint: "<changed|staged|all|FILE...> [--version 1.7 or 1.32.0]"
 ---
 
 # Apply google-java-format
