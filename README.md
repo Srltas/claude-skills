@@ -19,6 +19,7 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `tutor` | (`/tutor` only, manual) Patient expert teacher for the current work or a topic: defines every term first, then teaches step by step, grounded in real code/manuals, with comprehension checks. Korean, chat-only |
 | `blog` | Draft a Korean tech blog post for velog (minimal text, visuals-first): scaffolds `work-docs/blog/<date>-<slug>/`, renders diagrams to images via Kroki (velog can't render Mermaid) + matplotlib charts |
 | `java-format` | Apply google-java-format (AOSP, in place) to changed / staged / all / specific Java files; asks the version, resolves `~/Driver` or auto-downloads the jar |
+| `pr-draft` | Draft a PR title (`[XXX-0000]` + easy English) and Korean body (Purpose / Implementation / Remarks) from the current branch's commits and diff; draft only |
 | `worklog` | Record issue work as a Markdown note in your public `work-docs` repo (`<KEY>/<KEY>-<slug>.md`), a shareable PR-linkable trail that complements the internal master DOCX |
 | `note` | Record a non-issue exploration note (PoC, review, code analysis) in the public `work-docs` repo (`<category>/<YYYY-MM-DD>-<slug>.md`) |
 
