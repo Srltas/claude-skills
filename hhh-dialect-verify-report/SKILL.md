@@ -10,13 +10,13 @@ Run the hibernate-core suite against CUBRID (one version or the full matrix), di
 
 ⚠️ Long-running: the full suite is ~30 min **per version** (≈2.5 h for `--all-versions`). Use `--tests '<filter>'` for a quick smoke check first.
 
-## Step 0 — Prereqs
+## Step 0: Prereqs
 
 - Installed skills: **`hhh-dialect-verify`** and **`report`** (both under `~/.claude/skills/`).
 - Hibernate repo (default `~/Devel/hibernate`), Docker, `python3`, and for the report: `node` + global `docx`, plus the report venv (matplotlib). See the report skill's Step 0.
 - Optional: the **Understand-Anything** plugin (`/understand-*` commands). If installed, Step 3 can add a change-impact (영향 범위) note; the pipeline runs fine without it.
 
-## Step 1 — Run the orchestrator (verify across versions)
+## Step 1: Run the orchestrator (verify across versions)
 
 ```bash
 bash <skill-base-dir>/assets/run_verify.sh \
@@ -30,23 +30,23 @@ The baseline may be a `.tgz`, a `test-results/test` dir, or a `*.json` from a pr
 
 After each version the script **tears the CUBRID container down with its anonymous data volume** (`down -v`) before the next version, so the disk doesn't fill up across the matrix (each version's volume is ~2.7 GB). Pass `--no-cleanup` to keep the DB running for debugging.
 
-## Step 2 — Read the summary
+## Step 2: Read the summary
 
 Read `verify-out/summary.json` → `{ baseline_failed, versions: [{version, total, passed, failed, skipped, recovered, regressed, net, families, recovered_by_family, regressed_by_family}] }`.
 
-## Step 3 — Author the report spec (MANDATORY — the pipeline always reports)
+## Step 3: Author the report spec (MANDATORY: the pipeline always reports)
 
-Turn `summary.json` into a `report` JSON spec (a 비교 분석), using the real numbers — do not skip this:
+Turn `summary.json` into a `report` JSON spec (a 비교 분석), using the real numbers: do not skip this:
 
 - **conclusion**: headline net change + recovered/regressed, `**…**` on key numbers.
 - **결과** section: a `table` of version × (failed, +recovered, −regressed, net) with row `status` colors, plus a `bar`/`hbar` chart (failed-per-version for `--all-versions`, or before→after with a `-N` badge for a single version).
 - **실패 분류** section: an `hbar` of recovered-by-family (and/or top remaining families).
 - **회귀** section: if any `regressed`, a `note` (warn) + the regressed test list; else state "회귀 ~0".
-- **영향 범위** (선택 — only if the **Understand-Anything** plugin is installed): to complement the quantitative +N/−N deltas with the change's blast radius, run `/understand-diff` (for uncommitted changes) or `/understand-explain` on the dialect files, and fold the result into a short `note` or an "영향" subsection. If the plugin is not installed, skip this — the rest of the report is unchanged.
+- **영향 범위** (선택: only if the **Understand-Anything** plugin is installed): to complement the quantitative +N/−N deltas with the change's blast radius, run `/understand-diff` (for uncommitted changes) or `/understand-explain` on the dialect files, and fold the result into a short `note` or an "영향" subsection. If the plugin is not installed, skip this: the rest of the report is unchanged.
 
 Follow the report skill's schema + 작성 원칙 (간결, 표/차트 우선). Default `meta` = `CUBRID Dev1 · 작성일 <date>` (author = `CUBRID Dev1` unless the user names another).
 
-## Step 4 — Generate, validate, visually verify (MANDATORY)
+## Step 4: Generate, validate, visually verify (MANDATORY)
 
 ```bash
 NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin/python" \

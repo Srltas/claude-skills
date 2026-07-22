@@ -6,11 +6,11 @@ A git-managed collection of Claude Code skills, focused on CUBRID migration, JDB
 
 Each top-level directory containing a `SKILL.md` is one skill. Skills are grouped by domain prefix:
 
-- `hhh-*` — Hibernate ORM upstream / dialect work
-- `cmt-*` — CUBRID Migration Toolkit (runs, schema/data parity)
-- `jdbc-*` — CUBRID JDBC driver
-- `cubrid-*` — General CUBRID (manual, containers)
-- _(no prefix)_ — truly general-purpose skills
+- `hhh-*`: Hibernate ORM upstream / dialect work
+- `cmt-*`: CUBRID Migration Toolkit (runs, schema/data parity)
+- `jdbc-*`: CUBRID JDBC driver
+- `cubrid-*`: General CUBRID (e.g. manual lookup)
+- _(no prefix)_: truly general-purpose skills
 
 ## Adding / updating a skill
 
@@ -23,4 +23,4 @@ Prefer the `skill-create` skill, which scaffolds and self-reviews a new `SKILL.m
 
 ## Reference material (read-only)
 
-`vimkim/my-cubrid-skills` (cloned locally at `../my-cubrid-skills`) is a separate collection by another engineer, focused on CUBRID *engine* (C/C++) development. Use it as **read-only inspiration only** — never modify, fork, install from, or push to it. Every skill here is written fresh.
+`vimkim/my-cubrid-skills` (cloned locally at `../my-cubrid-skills`) is a separate collection by another engineer, focused on CUBRID *engine* (C/C++) development. Use it as **read-only inspiration only**: never modify, fork, install from, or push to it. Every skill here is written fresh.

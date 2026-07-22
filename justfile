@@ -1,7 +1,7 @@
 # claude-skills justfile
 # Manage this collection of Claude Code skills via the `npx skills` CLI.
 
-# Install all skills globally to ~/.claude/skills (symlinked)
+# Install all skills globally to ~/.claude/skills (copied)
 install:
     npx skills add . -y -g --agent claude-code
 

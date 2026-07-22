@@ -8,14 +8,14 @@ argument-hint: "bug|task [subject]"
 
 Write a ready-to-paste CUBRID JIRA issue from the current work. **Title in concise English; section headers in English; body in Korean.** The **Description** reads as plain, easy-to-understand prose (a reader new to the issue should get it); the **other sections are 개조식** (bullet points, 핵심만). This produces a draft only. You paste it into JIRA; the skill does not post.
 
-## Step 1 — Pick the type
+## Step 1: Pick the type
 
-- **bug** — something is broken / misbehaving.
-- **task** — non-bug work (개선 / 기능 / 일반 작업).
+- **bug**: something is broken / misbehaving.
+- **task**: non-bug work (개선 / 기능 / 일반 작업).
 
 Infer from the context; ask only if it is genuinely unclear.
 
-## Step 2 — Gather the facts
+## Step 2: Gather the facts
 
 Pull the specifics from the session (or ask the user):
 
@@ -24,9 +24,9 @@ Pull the specifics from the session (or ask the user):
 
 Do not invent. If a field is unknown, write `(확인 필요)` rather than guessing. (Optional: verify CUBRID behavior or terms with **cubrid-manual** before asserting.)
 
-## Step 3 — Write the draft
+## Step 3: Write the draft
 
-**Title (English, concise):** `[<AREA>] <short summary>` — one line, specific, no trailing period. Example: `[JDBC] getObject(LocalDateTime) throws on TIMESTAMP column`.
+**Title (English, concise):** `[<AREA>] <short summary>`: one line, specific, no trailing period. Example: `[JDBC] getObject(LocalDateTime) throws on TIMESTAMP column`.
 
 **Body (Korean, 개조식)** under the English headers for the chosen type:
 
@@ -65,8 +65,8 @@ Do not invent. If a field is unknown, write `(확인 필요)` rather than guessi
 
 Rules: **Description은 서술체**(읽는 사람이 이해하기 쉽게, 한두 문단), **그 외 섹션은 개조식**(한 항목 한 줄, 핵심만). 빈 섹션은 생략하지 말고 `없음` 또는 `(확인 필요)`로 남긴다 (`Additional Information`만 정보 없으면 생략 가능). em-dash(`—`)는 쓰지 않는다: 쉼표·콜론·괄호·마침표로 대체.
 
-## Step 4 — Output
+## Step 4: Output
 
-Print the draft in one copy-paste block: the English title line, then the Korean body. Do not post to JIRA — tell the user to paste it into a new CUBRID JIRA issue.
+Print the draft in one copy-paste block: the English title line, then the Korean body. Do not post to JIRA: tell the user to paste it into a new CUBRID JIRA issue.
 
 (If CUBRID JIRA renders wiki markup rather than Markdown in your project, convert `## X` to `h2. X` and `- ` to `* ` when pasting.)
