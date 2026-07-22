@@ -34,7 +34,7 @@ Read the key hunks of the diff if needed. Draft from what actually changed, not 
 
 ```markdown
 ## Purpose
-<이 PR의 목적이 무엇인가. 왜 필요한지. (필수)>
+<왜 이 작업을 하는가(무엇이 문제/필요인가) -> 이 PR이 무엇을 하는가 -> 그렇게 한 근거. (필수)>
 
 ## Implementation
 <이 PR을 구현하기 위해 어떻게 했는가. (선택: 없으면 N/A)>
@@ -43,7 +43,7 @@ Read the key hunks of the diff if needed. Draft from what actually changed, not 
 <주의사항, 후속 작업, 리뷰 포인트 등. (선택: 없으면 N/A)>
 ```
 
-Rules: **Purpose is required.** Implementation and Remarks are optional and become `N/A` when there is nothing to say. Keep each section tight (핵심만). em-dash(`—`)는 쓰지 않는다: 쉼표·콜론·괄호·마침표로 대체.
+Rules: **Purpose is required.** Implementation and Remarks are optional and become `N/A` when there is nothing to say. **톤**: 오픈소스 IT 개발자가 PR에 쓰듯 담백하고 자연스럽게. 공식 문서투·격식체·한자어 남발·수동태·논문투를 피하고, 흔한 개발 용어(오버로드, 커밋, 롤백, 엣지 케이스 등)는 억지로 번역하지 말고 그대로 쓴다. **문체**: 짧은 문장(한 문장 한 생각), Purpose는 **문제 -> 한 일 -> 근거** 흐름. 거창한 표현(예: "~를 처음 연다")·과한 압축은 피하고, 전문용어는 꼭 필요한 것만 풀어 쓴다. 핵심만. em-dash(`—`)는 쓰지 않는다: 쉼표·콜론·괄호·마침표로 대체.
 
 ## Step 5: Output
 
