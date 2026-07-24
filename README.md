@@ -20,6 +20,7 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `blog` | Draft a Korean tech blog post for velog (minimal text, visuals-first): scaffolds `work-docs/blog/<date>-<slug>/`, renders diagrams to images via Kroki (velog can't render Mermaid) + matplotlib charts |
 | `java-format` | Apply google-java-format (AOSP, in place) to changed / staged / all / specific Java files; asks the version, resolves the jar via `GJF_JAR`/`GJF_DIR`/cache or auto-downloads it |
 | `pr-draft` | Draft a PR title (`[XXX-0000]` + easy English) and Korean body (Purpose / Implementation / Remarks) from the current branch's commits and diff; draft only |
+| `review-triage` | Fetch your PR's review comments (human + bot), judge each against the real code, and draft a Korean summary + fix plan (valid) or reasoned reply (not valid); analysis only |
 | `worklog` | Record issue work as a Markdown note in your public `work-docs` repo (`<KEY>/<KEY>-<slug>.md`), a shareable PR-linkable trail that complements the internal master DOCX |
 | `note` | Record a non-issue exploration note (PoC, review, code analysis) in the public `work-docs` repo (`<category>/<YYYY-MM-DD>-<slug>.md`) |
 
