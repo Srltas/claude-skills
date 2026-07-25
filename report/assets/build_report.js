@@ -128,7 +128,8 @@ function pngSize(buf) { return [buf.readUInt32BE(16), buf.readUInt32BE(20)]; }
 /* Render a Mermaid source to PNG via the Kroki API. Kroki rasterizes server-side in a headless
    browser, so node text and CSS fills bake into the image and Word/LibreOffice render it faithfully.
    (Embedding Mermaid's SVG natively fails: both drop its HTML/foreignObject labels and <style> fills,
-   leaving solid black shapes with no text.) Nodes auto-size to their text, so labels never clip. */
+   leaving solid black shapes with no text.) Nodes auto-size to their text, so labels never clip.
+   Returns null if Kroki is unreachable (offline / outage), so the caller can degrade gracefully. */
 function krokiMermaidPng(code) {
   const base = `mmd_${process.pid}_${tmpFiles.length}`;
   const src = path.join(os.tmpdir(), base + ".mmd");
@@ -139,16 +140,33 @@ function krokiMermaidPng(code) {
     execFileSync("curl", ["-sf", "-X", "POST", `${kroki}/mermaid/png`,
       "-H", "Content-Type: text/plain", "--data-binary", "@" + src, "-o", out], { stdio: "ignore" });
   } catch (e) {
-    throw new Error("mermaid render failed: curl/Kroki error (network? set KROKI_URL to a self-hosted instance).");
+    return null;   // curl/network/Kroki failure: caller embeds a fallback instead of aborting the report
   }
-  if (!fs.existsSync(out) || fs.statSync(out).size === 0) throw new Error("mermaid render produced no PNG (invalid mermaid source, or Kroki unreachable).");
+  if (!fs.existsSync(out) || fs.statSync(out).size === 0) return null;
   return fs.readFileSync(out);
 }
 
-/* A `mermaid` block: {t:"mermaid", code:"flowchart LR…", caption?, width_in?}: rendered to PNG via Kroki. */
+function figCaption(text) {
+  return new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 },
+    children: [new TextRun({ text, italics: true, size: 18, color: GRAY, font: FONT })] });
+}
+
+/* A `mermaid` block: {t:"mermaid", code:"flowchart LR…", caption?, width_in?}: rendered to PNG via Kroki.
+   If Kroki is unreachable, degrade gracefully: keep the diagram's information as a warned code block
+   so the report still builds (offline / Kroki outage) rather than aborting the whole document. */
 function mermaidFigure(block) {
   if (!block.code) throw new Error("mermaid block: `code` (mermaid source) is required");
   const png = krokiMermaidPng(block.code);
+  if (!png) {
+    process.stderr.write("warning: mermaid render failed (Kroki unreachable?). Embedding the source as a code block; set KROKI_URL for a self-hosted instance.\n");
+    const out = [
+      noteBox("다이어그램을 렌더하지 못해(네트워크/Kroki 불통) 원본 소스를 그대로 첨부합니다.", "warn"),
+      new Paragraph({}),
+      codeBlock(block.code),
+    ];
+    if (block.caption) out.push(figCaption(block.caption));
+    return out;
+  }
   const [pw, ph] = pngSize(png);
   const wPx = Math.round((block.width_in || 6.4) * 96);
   const hPx = Math.round(wPx * ph / pw);
@@ -156,10 +174,7 @@ function mermaidFigure(block) {
     alignment: AlignmentType.CENTER, spacing: { before: 60, after: 60 },
     children: [new ImageRun({ type: "png", data: png, transformation: { width: wPx, height: hPx } })],
   })];
-  if (block.caption) out.push(new Paragraph({
-    alignment: AlignmentType.CENTER, spacing: { after: 120 },
-    children: [new TextRun({ text: block.caption, italics: true, size: 18, color: GRAY, font: FONT })],
-  }));
+  if (block.caption) out.push(figCaption(block.caption));
   return out;
 }
 

@@ -24,7 +24,7 @@ VENV="$HOME/.cache/claude-skills/report-venv"
 [ -x "$VENV/bin/python" ] || python3 -m venv "$VENV"
 "$VENV/bin/python" -c "import matplotlib" 2>/dev/null || "$VENV/bin/pip" -q install matplotlib
 ```
-The document is assembled with **docx-js**; `chart`/`diagram` blocks are rendered by `assets/figures.py` (matplotlib) and embedded as images.
+The document is assembled with **docx-js**; `chart`/`diagram` blocks are rendered by `assets/figures.py` (matplotlib) and embedded as images. Extra tools, needed only when those blocks are used: a `mermaid` block needs `curl` + network to reach **Kroki** (or set `KROKI_URL` to a self-hosted instance; if Kroki is unreachable the block degrades to a code block and the build continues); `svg` blocks and the Step 4 visual verification need **LibreOffice** (`soffice`) and `pdftoppm` (poppler).
 
 ## Step 1: Identify the report type and gather inputs
 
@@ -64,7 +64,7 @@ Write `<topic>.json`. See `assets/example.json` for a complete example. Schema:
   - `{"t":"chart","kind":"bar","title":"…","subtitle":"…","note":"하단 주석","signed":false,"bars":[{"label":"…","value":N,"color":"base|blue|good|lightgreen|warn|bad","badge":"강조\n둘째 줄","note":"바 위 메모"}]}`: vertical bars: bold-navy value labels, optional pill `badge` / colored `note` above a bar, subtle baseline (house style, no axes/grid)
   - `{"t":"chart","kind":"hbar","title":"…","subtitle":"…","note":"…","bars":[{"label":"…","value":N,"color":"…","tag":"유지","tag_color":"good"}]}`: horizontal ranked bars: label left (+ optional colored `tag`), proportional bar, bold-navy value at the end. Best for ranking magnitudes (`signed` defaults true)
   - For trends or share: `{"t":"chart","kind":"line|pie","labels":[…],"series":[{"name":"…","data":[…]}]}`
-  - `{"t":"mermaid","code":"flowchart LR\n  A[…] --> B{…}","caption":"그림 1","width_in":6.4}`: **Mermaid diagram: PREFER THIS for every structured 도식 (flow/workflow, sequence, state, ER, class, architecture).** Nodes auto-size to their text, so labels never clip. Rendered to PNG via Kroki (server-side headless browser) and embedded, so Word/LibreOffice show text + fills faithfully. Follow the **Mermaid 도식 작성 규칙** below. (Needs `curl` + network, or a self-hosted `KROKI_URL`.)
+  - `{"t":"mermaid","code":"flowchart LR\n  A[…] --> B{…}","caption":"그림 1","width_in":6.4}`: **Mermaid diagram: PREFER THIS for every structured 도식 (flow/workflow, sequence, state, ER, class, architecture).** Nodes auto-size to their text, so labels never clip. Rendered to PNG via Kroki (server-side headless browser) and embedded, so Word/LibreOffice show text + fills faithfully. Follow the **Mermaid 도식 작성 규칙** below. (Needs `curl` + network, or a self-hosted `KROKI_URL`; if Kroki is unreachable the block degrades to a code block, so the build never fails on this.)
   - `{"t":"svg","code":"<svg …>…</svg>","caption":"그림 2","width_in":6.4}`: hand-authored SVG, embedded as a native vector image with a PNG fallback. Use **only for bespoke visuals** a standard Mermaid diagram can't express (custom geometry, annotated layouts, non-graph illustrations). Follow the **SVG 도식 작성 규칙** below. (Needs LibreOffice for the fallback.)
   - `{"t":"diagram","direction":"LR|TB","nodes":[…],"edges":[…],"caption":"그림 2"}`: *(legacy)* matplotlib auto-layout flow; prone to text/shape overlap. **Do not use for new reports: author a `mermaid` block instead.**
   - `{"t":"code","text":"..."}`: monospace block (Consolas on light-gray)
