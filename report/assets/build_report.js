@@ -110,10 +110,51 @@ function svgFigure(block) {
   const wPx = Math.round((block.width_in || 6.4) * 96);
   const hPx = Math.round(wPx * ah / aw);
   const png = rasterizeSvg(svgAtSize(svg, wPx * 2, hPx * 2));
-  if (!png) throw new Error("svg block needs LibreOffice (soffice) for the PNG fallback — none found. brew install --cask libreoffice");
+  if (!png) throw new Error("svg block needs LibreOffice (soffice) for the PNG fallback: none found. brew install --cask libreoffice");
   const out = [new Paragraph({
     alignment: AlignmentType.CENTER, spacing: { before: 60, after: 60 },
     children: [new ImageRun({ type: "svg", data: Buffer.from(svg, "utf-8"), transformation: { width: wPx, height: hPx }, fallback: { type: "png", data: png } })],
+  })];
+  if (block.caption) out.push(new Paragraph({
+    alignment: AlignmentType.CENTER, spacing: { after: 120 },
+    children: [new TextRun({ text: block.caption, italics: true, size: 18, color: GRAY, font: FONT })],
+  }));
+  return out;
+}
+
+// PNG intrinsic size from the IHDR chunk (width at byte 16, height at byte 20, big-endian).
+function pngSize(buf) { return [buf.readUInt32BE(16), buf.readUInt32BE(20)]; }
+
+/* Render a Mermaid source to PNG via the Kroki API. Kroki rasterizes server-side in a headless
+   browser, so node text and CSS fills bake into the image and Word/LibreOffice render it faithfully.
+   (Embedding Mermaid's SVG natively fails: both drop its HTML/foreignObject labels and <style> fills,
+   leaving solid black shapes with no text.) Nodes auto-size to their text, so labels never clip. */
+function krokiMermaidPng(code) {
+  const base = `mmd_${process.pid}_${tmpFiles.length}`;
+  const src = path.join(os.tmpdir(), base + ".mmd");
+  const out = path.join(os.tmpdir(), base + ".png");
+  fs.writeFileSync(src, code); tmpFiles.push(src, out);
+  const kroki = (process.env.KROKI_URL || "https://kroki.io").replace(/\/$/, "");
+  try {
+    execFileSync("curl", ["-sf", "-X", "POST", `${kroki}/mermaid/png`,
+      "-H", "Content-Type: text/plain", "--data-binary", "@" + src, "-o", out], { stdio: "ignore" });
+  } catch (e) {
+    throw new Error("mermaid render failed: curl/Kroki error (network? set KROKI_URL to a self-hosted instance).");
+  }
+  if (!fs.existsSync(out) || fs.statSync(out).size === 0) throw new Error("mermaid render produced no PNG (invalid mermaid source, or Kroki unreachable).");
+  return fs.readFileSync(out);
+}
+
+/* A `mermaid` block: {t:"mermaid", code:"flowchart LR…", caption?, width_in?}: rendered to PNG via Kroki. */
+function mermaidFigure(block) {
+  if (!block.code) throw new Error("mermaid block: `code` (mermaid source) is required");
+  const png = krokiMermaidPng(block.code);
+  const [pw, ph] = pngSize(png);
+  const wPx = Math.round((block.width_in || 6.4) * 96);
+  const hPx = Math.round(wPx * ph / pw);
+  const out = [new Paragraph({
+    alignment: AlignmentType.CENTER, spacing: { before: 60, after: 60 },
+    children: [new ImageRun({ type: "png", data: png, transformation: { width: wPx, height: hPx } })],
   })];
   if (block.caption) out.push(new Paragraph({
     alignment: AlignmentType.CENTER, spacing: { after: 120 },
@@ -226,6 +267,7 @@ spec.blocks.forEach((b, i) => {
     case "note": children.push(noteBox(b.text, b.kind || "info"), new Paragraph({})); break;
     case "chart": case "diagram": for (const p of figure(b)) children.push(p); break;
     case "svg": for (const p of svgFigure(b)) children.push(p); break;
+    case "mermaid": for (const p of mermaidFigure(b)) children.push(p); break;
     case "pagebreak": children.push(new Paragraph({ children: [new PageBreak()] })); break;
     case "table": children.push(table(b), new Paragraph({})); break;   // spacer: keep tables from merging
   }

@@ -64,13 +64,29 @@ Write `<topic>.json`. See `assets/example.json` for a complete example. Schema:
   - `{"t":"chart","kind":"bar","title":"…","subtitle":"…","note":"하단 주석","signed":false,"bars":[{"label":"…","value":N,"color":"base|blue|good|lightgreen|warn|bad","badge":"강조\n둘째 줄","note":"바 위 메모"}]}`: vertical bars: bold-navy value labels, optional pill `badge` / colored `note` above a bar, subtle baseline (house style, no axes/grid)
   - `{"t":"chart","kind":"hbar","title":"…","subtitle":"…","note":"…","bars":[{"label":"…","value":N,"color":"…","tag":"유지","tag_color":"good"}]}`: horizontal ranked bars: label left (+ optional colored `tag`), proportional bar, bold-navy value at the end. Best for ranking magnitudes (`signed` defaults true)
   - For trends or share: `{"t":"chart","kind":"line|pie","labels":[…],"series":[{"name":"…","data":[…]}]}`
-  - `{"t":"svg","code":"<svg …>…</svg>","caption":"그림 2","width_in":6.4}`: **hand-authored SVG diagram: PREFER THIS for every 도식/그림 (flow, architecture, state, sequence).** Authored like a visualize widget, embedded as a native vector image in Word (crisp, zero glyph/shape overlap) with an auto-generated PNG fallback. Follow the **SVG 도식 작성 규칙** below. (Needs LibreOffice for the fallback.)
-  - `{"t":"diagram","direction":"LR|TB","nodes":[…],"edges":[…],"caption":"그림 2"}`: *(legacy)* matplotlib auto-layout flow; prone to text/shape overlap and stiff shapes. **Do not use for new reports: author an `svg` block instead.**
+  - `{"t":"mermaid","code":"flowchart LR\n  A[…] --> B{…}","caption":"그림 1","width_in":6.4}`: **Mermaid diagram: PREFER THIS for every structured 도식 (flow/workflow, sequence, state, ER, class, architecture).** Nodes auto-size to their text, so labels never clip. Rendered to PNG via Kroki (server-side headless browser) and embedded, so Word/LibreOffice show text + fills faithfully. Follow the **Mermaid 도식 작성 규칙** below. (Needs `curl` + network, or a self-hosted `KROKI_URL`.)
+  - `{"t":"svg","code":"<svg …>…</svg>","caption":"그림 2","width_in":6.4}`: hand-authored SVG, embedded as a native vector image with a PNG fallback. Use **only for bespoke visuals** a standard Mermaid diagram can't express (custom geometry, annotated layouts, non-graph illustrations). Follow the **SVG 도식 작성 규칙** below. (Needs LibreOffice for the fallback.)
+  - `{"t":"diagram","direction":"LR|TB","nodes":[…],"edges":[…],"caption":"그림 2"}`: *(legacy)* matplotlib auto-layout flow; prone to text/shape overlap. **Do not use for new reports: author a `mermaid` block instead.**
   - `{"t":"code","text":"..."}`: monospace block (Consolas on light-gray)
   - `{"t":"pagebreak"}`: force a page break (cover→목차→본문 breaks are automatic)
 - Table `status` per row: `good` = green (pass), `bad` = red (fail), `warn` = gray, omitted = neutral. The header row is auto sky-blue and repeats across page breaks.
 
 Follow the type skeleton from Step 1 and the 작성 원칙 above. Language: Korean, plain and direct.
+
+### 도식 선택 (어떤 블록을 쓸까)
+
+1. **구조화된 도식**(흐름/워크플로, 시퀀스, 상태, ER, 클래스, 아키텍처) → **`mermaid`**. 노드가 글자에 맞춰 자동으로 커지므로 글자 짤림이 없고, 손으로 좌표를 잡을 필요가 없다. 기본값으로 삼는다.
+2. **정량 비교/추세/비율**(막대·선·파이) → **`chart`**.
+3. **표준 그래프로 표현 못 하는 맞춤 그림**(특수 기하, 주석 레이아웃, 삽화) → **`svg`**를 직접 작성.
+
+### Mermaid 도식 작성 규칙 (the `mermaid` block)
+
+- **문법**: 첫 줄에 다이어그램 종류(`flowchart LR|TB`, `sequenceDiagram`, `stateDiagram-v2`, `erDiagram`, `classDiagram`)를 쓰고, 노드/엣지를 이어서 정의한다. 라벨은 한국어로 간결하게.
+- **방향**: 노드가 4개를 넘으면 `flowchart LR`(가로)보다 `flowchart TB`(세로)가 페이지 폭에 맞아 글자가 더 크게 나온다. 폭이 넘칠 것 같으면 세로로.
+- **크기**: `width_in`으로 문서 내 폭을 정한다(기본 6.4). Kroki가 텍스트에 맞춰 렌더하므로 폭만 정하면 된다.
+- **분기 라벨**: 조건 분기는 엣지 라벨(`B -->|성공| C`)로 표기한다.
+- **금지**: `%%{init}%%` 로 `htmlLabels`를 끄지 말 것(불필요). 노드 라벨에 `—`(em-dash) 쓰지 말 것.
+- Kroki가 각 도식을 서버에서 브라우저로 렌더해 PNG로 굽는다: 글자와 색이 항상 이미지에 박혀 Word/LibreOffice에서 그대로 보인다.
 
 ### SVG 도식 작성 규칙 (the `svg` block)
 
@@ -91,7 +107,7 @@ NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin
   node "<skill-base-dir>/assets/build_report.js" <topic>.json <output>.docx
 ```
 
-`<skill-base-dir>` is this skill's own directory (shown as its base directory when the skill runs). `build_report.js` calls `figures.py` for `chart`/`diagram` blocks (matplotlib), and rasterizes each `svg` block's PNG fallback via LibreOffice (`soffice`, resolved on PATH → macOS app bundle). Filename convention: `CUBRID_<주제>_<유형>_YYYYMMDD.docx`.
+`<skill-base-dir>` is this skill's own directory (shown as its base directory when the skill runs). `build_report.js` calls `figures.py` for `chart`/`diagram` blocks (matplotlib), renders each `mermaid` block to PNG via Kroki (`curl`; override the endpoint with `KROKI_URL`), and rasterizes each `svg` block's PNG fallback via LibreOffice (`soffice`, resolved on PATH → macOS app bundle). Filename convention: `CUBRID_<주제>_<유형>_YYYYMMDD.docx`.
 
 ## Step 4: Validate, visually verify, hand off
 
@@ -103,6 +119,8 @@ NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin
 ```
 
 **2) Visual verification**: render every page to an image and read them, to catch layout issues the schema can't (clipped chart labels, overlapping text, a `note` box merging into a table, broken page breaks, color/table problems). This is the PRIMARY defect-catcher; schema validation cannot see any of these. **Do not skip it whenever `soffice` resolves**: only skip if LibreOffice is genuinely absent (and then say so explicitly).
+
+**Per-diagram check (render → look → fix → repeat)**: when you read the rendered pages, inspect **each figure** specifically: is every node label fully inside its box, no text clipped or overlapping, no shape collision, arrows landing on borders, the whole figure within the page width? If a figure is wrong, fix its block (for `mermaid`: switch `LR`↔`TB`, shorten labels, or adjust `width_in`; for `svg`: resize the box or canvas) and re-run Step 3 + this render, then look again. Repeat until every diagram is clean. Do not hand off a report with a diagram you have not looked at.
 
 ```bash
 # Resolve LibreOffice robustly: PATH first (brew/linux), then the macOS .app bundle.

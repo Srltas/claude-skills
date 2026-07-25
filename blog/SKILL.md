@@ -46,6 +46,9 @@ Put each source in `assets/`, render it to an image, and embed with `![설명](a
 - **Data charts**: build a chart JSON and render it with the report skill's `figures.py` to `assets/chart-N.png` (see the report skill for the `figures.py <block.json> <out.png>` command).
 - **Hand-drawn / architecture**: if an Excalidraw skill is installed, use it to produce `assets/*.png`.
 - Keep diagrams simple (roughly 10-15 nodes); dense graphs render poorly.
+- **Prefer Mermaid** for structured visuals (flow/sequence/state/ER/class): nodes auto-size to their text, so labels never clip.
+
+**Verify every image (render → look → fix → repeat)**: after rendering, **Read the PNG** and check it: is every label fully inside its node, nothing clipped or overlapping, the whole figure readable at blog width? If a diagram is wrong, fix the `.mmd` (switch `LR`↔`TB`, shorten labels, or split it) and re-render, then look again. Repeat until each image is clean. Never embed a diagram you have not looked at.
 
 Note: Kroki (`https://kroki.io`) is a public service, so the diagram source is sent there. That is fine for public blog content. Point `KROKI_URL` at a self-hosted instance if you prefer.
 

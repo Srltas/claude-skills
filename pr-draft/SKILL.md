@@ -43,6 +43,8 @@ Read the key hunks of the diff if needed. Draft from what actually changed, not 
 <주의사항, 후속 작업, 리뷰 포인트 등. (선택: 없으면 N/A)>
 ```
 
+**도식(선택)**: 구조·흐름 변화가 말로만 설명하기 복잡하면 Implementation에 `mermaid` 코드블록을 넣어도 좋다(GitHub PR 본문이 자동 렌더, 노드는 텍스트에 맞춰 자동 크기 조정이라 짤림 없음). 꼭 필요할 때만 간결하게.
+
 Rules: **Purpose is required.** Implementation and Remarks are optional and become `N/A` when there is nothing to say. **톤**: 오픈소스 IT 개발자가 PR에 쓰듯 담백하고 자연스럽게. 공식 문서투·격식체·한자어 남발·수동태·논문투를 피하고, 흔한 개발 용어(오버로드, 커밋, 롤백, 엣지 케이스 등)는 억지로 번역하지 말고 그대로 쓴다. **문체**: 짧은 문장(한 문장 한 생각), Purpose는 **문제 -> 한 일 -> 근거** 흐름. 거창한 표현(예: "~를 처음 연다")·과한 압축은 피하고, 전문용어는 꼭 필요한 것만 풀어 쓴다. 핵심만. em-dash(`—`)는 쓰지 않는다: 쉼표·콜론·괄호·마침표로 대체.
 
 ## Step 5: Output

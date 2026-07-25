@@ -37,6 +37,8 @@ For each comment, output (요약/판정/계획 or 답변 in Korean for the user)
 - if 타당 → **수정 계획**: which file and approach, briefly.
 - if 부당/부분 → **답변 초안**: a reasoned reply to post. Write the reply in the reviewer's language (English for upstream repos such as Hibernate, Korean for CUBRID internal repos); keep the user-facing 요약/판정 in Korean.
 
+If a reply needs to explain a non-trivial flow or relationship, an inline `mermaid` code block is an option (GitHub renders it in PR comments; nodes auto-size to text). Use it only when a diagram is clearer than a sentence.
+
 Tone: open-source developer voice, plain and direct, not academic or formal-document. No em-dash (`—`): use commas, colons, parentheses, periods.
 
 ## Step 5: Hand off (no posting, no fixing)
