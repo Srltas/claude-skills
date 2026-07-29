@@ -14,7 +14,16 @@ For work that has **no JIRA issue**: PoC, 검토(review), 코드 분석, and the
 
 ## Step 1: Category and slug
 
-Pick a free-form **lowercase category** (e.g. `poc`, `review`, `analysis`, or anything that fits) and a short **slug**. **Write the note in Korean.** The date is added automatically (`YYYY-MM-DD`).
+The invocation is `<category> <slug>`. **A category the user names wins over inference:**
+
+1. **If the user named a category, use it verbatim** (lowercased). A leading ASCII word (`/note bug …` → `bug`), or any word matching an existing folder, is the category, even when the rest of the request describes the content: `/note bug 분석한 내용...` still means category `bug`, not `analysis`.
+2. **Reuse an existing category** rather than inventing a near-duplicate (`bug` vs `analysis`). List them first (uppercase folders are worklog issue keys: skip them):
+   ```bash
+   REPO="${WORK_DOCS_REPO:-$HOME/Devel/work-docs}"; ls -d "$REPO"/*/ 2>/dev/null | xargs -n1 basename | grep -vE '^[A-Z]'
+   ```
+3. **Only if the user named no category, infer one** that fits (`poc`, `review`, `analysis`, …).
+
+Then pick a short **slug**. **Before scaffolding, state the resolved `<category>/<slug>`**; if you inferred the category (step 3) or it would create a brand-new folder, confirm with the user first (it creates a directory). **Write the note in Korean.** The date is added automatically (`YYYY-MM-DD`).
 
 ## Step 2: Scaffold the file
 
