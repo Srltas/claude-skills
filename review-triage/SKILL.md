@@ -21,10 +21,12 @@ Read the title and body: they state **what this PR set out to do**, which Step 3
 ## Step 2: Fetch the reviews
 
 ```bash
-bash <skill-base-dir>/assets/fetch_reviews.sh [PR]
+bash <skill-base-dir>/assets/fetch_reviews.sh [PR] [--include-resolved]
 ```
 
 Merges inline code comments, review summaries, and PR-level comments (humans and bots, shown as `(User)` / `(Bot)`) with thread/reply info. Needs `gh` (authenticated) and `jq`.
+
+**Comments in resolved review threads are skipped**: that discussion is already settled, so re-judging it wastes effort and reopens closed points. The script prints how many it skipped; pass `--include-resolved` when you do want to revisit them (say, to check that a resolved thread was actually addressed). Threads that are merely **outdated** (the diff moved) are still shown: outdated is not resolved. If `$ARGUMENTS` is a full PR URL, its owner/repo is used, so a URL from another repo is not read as the current directory's PR.
 
 ## Step 3: Judge each comment on evidence, not on authority
 
