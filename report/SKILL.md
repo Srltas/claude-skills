@@ -45,6 +45,7 @@ Optimize for a reader who skims. Keep prose minimal and let structure carry the 
 - **Lead with the conclusion**: the cover `conclusion` states the answer first; `1. 개요` is one short paragraph.
 - **Core points only**: short sentences, one idea per bullet; cut background the reader can infer.
 - **Prefer tables / charts / figures over paragraphs**: turn comparisons, metrics, and status into a color-coded `table`; turn trends or distributions into a chart embedded via an `image`; use a `note` box for the single most important caveat. Reserve `p` paragraphs for the few sentences that truly need prose.
+- **One fact per bullet, and no long inline lists**: do not pack `현재 → 목표` into one sentence (make it two table columns), and never chain more than four names (classes, files, options) with commas. Split them into a `table` when the reader needs each name, or compress to **기준 + 개수** when they only need the scope (e.g. "`Wrapper`를 구현하는 7개 클래스").
 - **Emphasize only the few key terms** with `**…**` so the eye lands on them.
 - **No em-dash**: never use the `—` character in the document; use commas, colons, parentheses, or periods instead.
 
