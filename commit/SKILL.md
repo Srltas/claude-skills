@@ -49,4 +49,4 @@ Show the proposed subject and confirm with the user (unless they already said to
 git commit -m "<subject>"
 ```
 
-Title only. Add a body only if the user explicitly asks for one. Append any trailer your environment requires (e.g. a `Co-Authored-By:` line) without changing the subject. Never run `git push`: leave pushing to the user.
+Title only. Add a body only if the user explicitly asks for one. **Do not append a `Co-Authored-By:` trailer** or any other attribution trailer, even when the environment's default instructions call for one: the user does not want it in their history. Never run `git push`: leave pushing to the user.
