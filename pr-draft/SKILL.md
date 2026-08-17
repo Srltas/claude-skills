@@ -1,7 +1,7 @@
 ---
 name: pr-draft
-description: "Draft a pull request (title + body) from the current branch's commits and diff. The title is [XXX-0000] plus a concise, easy-to-understand English summary (the key is taken from the branch name); the body is Korean in three sections: Purpose (required, why this PR exists), Implementation (optional, how it was built), Remarks (optional, notes). Optional sections become N/A when empty. Produces a copy-paste draft only; it does not create the PR. Triggers on phrases like 'PR 초안 작성', 'pr-draft', '이 브랜치 PR로 정리', 'draft a PR', 'PR 제목이랑 본문 만들어줘'."
-argument-hint: "[base-branch]"
+description: "Draft a pull request (title + body) from the current branch's commits and diff. The title is [XXX-0000] plus a concise, easy-to-understand English summary (the key is taken from the branch name); the body is Korean in three sections: Purpose (required, why this PR exists), Implementation (optional, how it was built), Remarks (optional, notes). Optional sections become N/A when empty. Passing `--tc` switches to a compact TC template for CMT (cubrid-migration) unit-test PRs only, summarized in a few lines with real counts (@Nested groups, tests run, `// DEFECT:` markers, suite before -> after); it is never selected automatically. Produces a copy-paste draft only; it does not create the PR. Triggers on phrases like 'PR 초안 작성', 'pr-draft', '이 브랜치 PR로 정리', 'draft a PR', 'PR 제목이랑 본문 만들어줘'."
+argument-hint: "[base-branch] [--tc for CMT unit-test PR]"
 ---
 
 # Draft a pull request
@@ -12,7 +12,7 @@ Turn the current branch into a ready-to-paste PR title and body, grounded in the
 
 - Current branch: `git rev-parse --abbrev-ref HEAD`.
 - **Key**: extract `PROJECT-NUMBER` from the branch name (e.g. `HHH-20527-modernize-...` -> `HHH-20527`). If the branch has no such key, ask the user for it.
-- **Base**: use the first ref that exists, checked with `git rev-parse --verify <ref>`: `upstream/main`, then `origin/main`, then `main`. If `$ARGUMENTS` names a base, use that. If still unclear, ask.
+- **Base**: use the first ref that exists, checked with `git rev-parse --verify <ref>`: `upstream/main`, then `origin/main`, then `main`. If `$ARGUMENTS` names a base, use that (`--tc` is a body-template flag, not a base: ignore it here). If still unclear, ask.
 
 ## Step 2: Read the changes (grounding)
 
@@ -32,6 +32,22 @@ Read the key hunks of the diff if needed. Draft from what actually changed, not 
 
 ## Step 4: Body (Korean, three sections)
 
+양식은 두 가지이고, **기본이 기본값이다.**
+
+- **기본**: 별도 지시가 없으면 항상 이것.
+- **TC 양식**: **CMT(cubrid-migration) 단위 테스트 추가 PR에만** 쓴다. 사용자가 `--tc`를 주거나 "TC PR", "단위 테스트 PR" 처럼 명시했을 때만 선택한다. **diff가 테스트뿐이라는 이유로 자동 전환하지 않는다**: 다른 저장소의 테스트 PR에 CMT 전용 문구(Tibero 양식, `-Punit-test`)가 섞여 들어간다.
+
+`--tc`가 오면 대상이 CMT가 맞는지 확인한다. 둘 중 하나면 맞다:
+
+```bash
+git remote get-url origin | grep -q cubrid-migration
+grep -q "<id>unit-test</id>" pom.xml
+```
+
+CMT가 아닌데 `--tc`가 왔으면 그대로 쓰지 말고 사용자에게 확인한다 (템플릿의 `mvn -B -Punit-test test`와 Tibero 문구가 그 저장소에는 없다). 반대로 `--tc` 없이 CMT의 테스트 전용 PR로 보이면, 자동으로 바꾸지 말고 "TC 양식으로 할까요?"라고 한 줄 물어본다.
+
+### 기본
+
 ```markdown
 ## Purpose
 <왜 이 작업을 하는가(무엇이 문제/필요인가) -> 이 PR이 무엇을 하는가 -> 그렇게 한 근거. (필수)>
@@ -42,6 +58,36 @@ Read the key hunks of the diff if needed. Draft from what actually changed, not 
 ## Remarks
 <주의사항, 후속 작업, 리뷰 포인트 등. (선택: 없으면 N/A)>
 ```
+
+### TC 양식 (CMT 단위 테스트 추가)
+
+```markdown
+## Purpose
+<대상 클래스가 무엇이고 왜 테스트가 필요한가 (2~3줄)>
+<레거시에서 회수했는지, 신규인지. 프로덕션 변경 여부>
+
+## Implementation
+- <테스트 클래스명> 추가: <@Nested 그룹 수>, 실행 <N>개
+- 양식은 기존 Tibero 테스트를 따름
+- <특이사항 있으면 한 줄>
+
+## Remarks
+- characterization test. 결함 <N>건은 `// DEFECT:` 표시 (별도 이슈)
+- `mvn -B -Punit-test test`: <이전> -> <이후>, 실패 0
+- <후속 PR 언급>
+```
+
+**정말 간단히 쓴다.** 불릿 하나에 한 줄, 숫자 위주. 테스트가 무엇을 검증하는지 항목별로 나열하지 않는다 (리뷰어는 코드를 본다). 해당 없는 줄(특이사항, 후속 PR)은 `N/A`로 채우지 말고 줄째로 뺀다.
+
+**숫자는 실제로 구한다** (추측하지 말 것):
+
+```bash
+grep -c "@Nested" <테스트파일>                    # @Nested 그룹 수
+grep -c "// DEFECT:" <테스트파일>                 # 결함 표시 건수
+mvn -B -Punit-test test                           # "Tests run: N, Failures: 0" 에서 실행 개수·실패 확인
+```
+
+`실행 <N>개`는 **이 테스트 클래스**의 실행 수, Remarks의 `<이전> -> <이후>`는 **스위트 전체** 실행 수다 (파라미터화 테스트가 늘어나므로 `@Test` 개수를 세지 말고 실행 결과의 `Tests run`을 쓴다). 이전 수치는 base에서 같은 명령을 돌리거나 직전 PR 기록에서 가져온다.
 
 **도식(선택)**: 구조·흐름 변화가 말로만 설명하기 복잡하면 Implementation에 `mermaid` 코드블록을 넣어도 좋다(GitHub PR 본문이 자동 렌더, 노드는 텍스트에 맞춰 자동 크기 조정이라 짤림 없음). 꼭 필요할 때만 간결하게.
 
