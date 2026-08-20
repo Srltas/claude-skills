@@ -63,31 +63,31 @@ Do not invent. If a field is unknown, write `(확인 필요)` rather than guessi
 - 코드 / 테스트 / 문서 등 완료 기준
 ```
 
-#### Specification Changes 판단 기준
+#### What belongs in Specification Changes
 
-이 섹션은 **QA와 매뉴얼 담당자가 읽는 곳**이다. 판단 기준은 하나: **이 작업 때문에 테스트나 문서를 고쳐야 하는가.** "사양"을 SQL 문법 변경 같은 큰 것으로만 좁게 보지 말 것. 아래 중 하나라도 달라지면 **없음이 아니다**:
+QA and the manual writers read this section, so there is one test: **does this work force a test or a document to change?** Do not read "사양" narrowly as "an SQL syntax change". If any of these differs, the answer is **not 없음**:
 
-- **동작**: 쿼리 결과, 기본 동작, 에러 코드·메시지, 로그·출력 포맷
-- **인터페이스**: SQL 문법, 함수·API 시그니처, JDBC 동작, CLI 옵션
-- **설정**: 파라미터 추가·삭제, 기본값·허용 범위
-- **산출물·의존성**: 라이브러리 버전, 배포 jar 구성, 파일 경로·이름, 지원 JDK·플랫폼
-- **제약**: 지원 범위, 호환성, 성능 보장치
+- **동작**: query results, default behavior, error codes and messages, log or output format
+- **인터페이스**: SQL syntax, function and API signatures, JDBC behavior, CLI options
+- **설정**: parameters added or removed, defaults, allowed ranges
+- **산출물·의존성**: library versions, the shipped jar set, file paths and names, supported JDK and platforms
+- **제약**: supported scope, compatibility, performance guarantees
 
-**형식**: 항목마다 `현재 → 목표`를 버전·경로·값까지 구체적으로 쓰고, 항목이 많으면 표로. 바뀌지 않는 것도 함께 못박으면 좋다 (예: "그 외 라이브러리·경로 변경 없음").
+**Form**: write each item as `현재 → 목표`, concrete down to the version, path, or value, and use a table once there are several. Pinning down what does *not* change helps too (e.g. "그 외 라이브러리·경로 변경 없음").
 
-**정말 없음인 경우**: 밖에서 관찰되는 것이 하나도 안 바뀌는 순수 내부 리팩터링뿐이다. 그때도 맨 "없음"이 아니라 무엇이 그대로인지 한 줄로 적는다 (예: "없음 (동작·인터페이스·산출물 구성 동일)").
+**Genuinely 없음** covers only a pure internal refactor where nothing observable from outside changes. Even then, do not write a bare "없음": say in one line what stayed the same (e.g. "없음 (동작·인터페이스·산출물 구성 동일)").
 
-#### 읽히게 쓰기 (형태 규칙)
+#### Write it to be read (shape rules)
 
-읽는 사람이 훑어서 파악할 수 있어야 한다. 형태는 취향이 아니라 **담는 데이터의 모양**이 정한다.
+The reader should get it by skimming. Shape is not a matter of taste: **the shape of the data decides it.**
 
-- **표 / 불릿 / 문장 고르기**: 같은 항목을 여러 대상에 반복하면 **표**(열: 대상 · 현재 · 변경 후), 서로 다른 사실 2~3개면 불릿, 한 문장이면 그냥 문장.
-- **한 불릿 = 한 사실**: `현재 → 목표`를 한 문장에 욱여넣지 않는다. 조건에 따라 결과가 갈리면 조건을 행으로 하는 표로.
-- **나열은 4개부터 문장에서 뺀다**: 클래스·파일·옵션 이름을 넷 넘게 쉼표로 잇지 않는다. 독자가 개별 이름을 확인할 일이 있으면 표나 목록으로 분리하고, 범위 감만 필요하면 **기준 + 개수**로 압축한다 (예: "`Wrapper`를 구현하는 7개 클래스, 상속 포함 12개 타입").
-- **반복은 서두로**: 여러 항목의 현재 상태가 같으면 앞에 한 번만 쓰고, 표에는 달라지는 것만 남긴다.
-- **성격이 다르면 블록을 나눈다**: 동작·적용 범위·제외 대상·무변경처럼 종류가 다른 정보를 한 불릿 목록에 섞지 않는다.
+- **Table / bullets / sentence**: the same field repeated across several targets is a **table** (columns: 대상 · 현재 · 변경 후); two or three unrelated facts are bullets; one fact is just a sentence.
+- **One bullet = one fact**: never cram `현재 → 목표` into a single sentence. When the result differs by condition, make the condition the row of a table.
+- **Pull a list of four or more out of the sentence**: do not chain more than four class/file/option names with commas. Split them into a table or list when the reader needs each name; compress to **기준 + 개수** when they only need the scope (e.g. "`Wrapper`를 구현하는 7개 클래스, 상속 포함 12개 타입").
+- **Say a shared fact once, up front**: when several rows share the same current state, state it once before the table and leave only what differs inside it.
+- **Split blocks that differ in kind**: do not mix behavior, scope, exclusions, and no-change into one bullet list.
 
-Rules: **Description은 서술체**(읽는 사람이 이해하기 쉽게, 한두 문단), **그 외 섹션은 개조식**(한 항목 한 줄, 핵심만). 빈 섹션은 생략하지 말고 `없음` 또는 `(확인 필요)`로 남긴다 (`Additional Information`만 정보 없으면 생략 가능). em-dash(`—`)는 쓰지 않는다: 쉼표·콜론·괄호·마침표로 대체.
+Rules: **Description is 서술체** (one or two easy paragraphs), **every other section is 개조식** (one line per item, essentials only). Do not drop an empty section: leave `없음` or `(확인 필요)` (only `Additional Information` may be omitted when there is nothing). No em-dash (`—`): use commas, colons, parentheses, periods.
 
 ## Step 4: Output
 

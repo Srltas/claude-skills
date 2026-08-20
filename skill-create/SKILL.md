@@ -61,7 +61,13 @@ Frontmatter: `name` (kebab-case, matching the directory) and `description`.
 - Put ALL the "when to use" in the description, not in the body.
 - Be specific and a little assertive so it fires when it should, but keep the triggers tied to THIS workflow so it does not fire on unrelated tasks.
 
-**Body:** a `# Title` heading and numbered, executable steps with exact commands. Reference bundled files with `<skill-base-dir>/…`. No placeholders, no leftover `<!-- … -->` comments. Match the collection's language and house style. Then write any `scripts/`, `references/`, `assets/` decided in Step 5.
+**Body:** a `# Title` heading and numbered, executable steps with exact commands. Reference bundled files with `<skill-base-dir>/…`. No placeholders, no leftover `<!-- … -->` comments. Match the collection's house style.
+
+**Write the instructions in English.** SKILL.md is read by the model on every invocation, and Korean costs roughly twice the tokens for the same content. Keep Korean only where it is carrying meaning that English would lose:
+
+- **output templates** for Korean deliverables (the placeholder text inside the fenced block: it doubles as the spec for the result),
+- **Korean style terms** with no clean English equivalent (`개조식`, `서술체`),
+- **quoted Korean phrases** that the rule is about (e.g. a banned opener). Then write any `scripts/`, `references/`, `assets/` decided in Step 5.
 
 ## Step 7: Test the skill (lightweight eval)
 

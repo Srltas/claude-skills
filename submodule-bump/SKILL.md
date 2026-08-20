@@ -13,19 +13,19 @@ Dispatch `submodule-bump-receiver.yml` on `CUBRID/cubrid` so the parent repo pin
 ## Step 0: Check the state first (read-only)
 
 ```bash
-bash <skill-base-dir>/assets/bump_submodule.sh --status            # 세 개 요약
-bash <skill-base-dir>/assets/bump_submodule.sh <submodule> --status # 그 서브모듈의 밀린 커밋 목록
+bash <skill-base-dir>/assets/bump_submodule.sh --status             # all three, at a glance
+bash <skill-base-dir>/assets/bump_submodule.sh <submodule> --status # that one's pending commits
 ```
 
-조회만 하므로 확인 없이 바로 실행해도 된다. 한 번의 호출로 세 서브모듈의 반영 SHA, 최신 SHA, 밀린 개수, 열린 bump PR을 한 번에 보여준다.
+Read-only, so run it without asking first. One call reports, for all three submodules, the pinned SHA, the submodule head, how many commits are pending, and the open bump PR.
 
-**열린 PR이 이미 최신을 담고 있으면 워크플로를 실행할 필요가 없다**: 그 PR을 머지하면 된다. 이 경우 스크립트가 `just merge it`으로 알려주므로, 실행을 권하지 말고 머지를 안내한다.
+**When the open PR already pins the head there is nothing to dispatch**: merging that PR is the whole job. The script says `just merge it` in that case, so guide the user to merge rather than suggesting a run.
 
-개별 조회는 부모에 반영된 커밋 **이후** 새로 들어온 커밋만 오래된 순으로 번호를 붙여 보여준다 (20개까지, 넘으면 남은 개수를 명시). 그 번호가 곧 "몇 번째 커밋까지 반영할지"이므로, 사용자가 특정 커밋까지만 원할 때 여기서 SHA를 고른다.
+The per-submodule view lists only the commits added **after** the pinned one, oldest first and numbered (up to 20; beyond that it states how many remain). That number is exactly "how far to bump", so pick the SHA here when the user wants to stop at a specific commit.
 
 ## Step 1: Resolve the target
 
-| 사용자가 말하는 것 | 워크플로 입력 `submodule_path` | 서브모듈 저장소 |
+| What the user says | workflow input `submodule_path` | submodule repo |
 |---|---|---|
 | `jdbc`, `cubrid-jdbc` | `cubrid-jdbc` | `cubrid/cubrid-jdbc` |
 | `cci`, `cubrid-cci` | `cubrid-cci` | `CUBRID/cubrid-cci` |
@@ -43,20 +43,20 @@ bash <skill-base-dir>/assets/bump_submodule.sh <submodule> <sha|latest>
 
 It prints the currently pinned SHA, the target, the direction of the move, and a compare link, then shows the exact `gh` command **without running it**. It refuses, and dispatches nothing, when:
 
-| 거부 사유 | 뜻 |
+| Refusal | Meaning |
 |---|---|
-| not a bumpable submodule | 허용된 세 개가 아니다 |
-| not a commit SHA / not found | SHA 형식이 아니거나 그 저장소에 없는 커밋 |
-| not merged into develop | 아직 서브모듈 develop에 머지되지 않았다 |
-| already pins … | 이미 그 커밋이 반영되어 있다 |
-| BEHIND the pinned one | 과거 커밋이다. 되돌리려면 서브모듈에서 revert 커밋을 만들고 그것을 지정한다 |
-| history looks rewritten | 강제 푸시로 이력이 재작성됐다. `--reanchor`가 필요하다 |
+| not a bumpable submodule | not one of the three allowed |
+| not a commit SHA / not found | not a SHA, or no such commit in that repo |
+| not merged into develop | the commit is not on the submodule's develop yet |
+| already pins … | that commit is already pinned |
+| BEHIND the pinned one | it is an older commit. To roll back, make a revert commit in the submodule and pin that |
+| history looks rewritten | a force-push rewrote history. `--reanchor` is required |
 
 ## Step 3: Show it and get confirmation
 
 Show the user the summary from Step 2 (pinned -> target, how many commits, the compare link) and ask whether to dispatch. Do not run it on your own initiative.
 
-**지정한 SHA까지의 커밋이 모두 반영된다**: 중간 커밋만 골라 넣을 수 없다. 3번 커밋을 지정하면 1, 2번도 함께 들어간다.
+**Everything up to the chosen SHA comes in**: you cannot cherry-pick a middle commit. Naming commit 3 brings 1 and 2 with it.
 
 ## Step 4: Dispatch
 
@@ -70,15 +70,15 @@ Then report the run:
 gh run list --repo CUBRID/cubrid --workflow submodule-bump-receiver.yml --limit 3
 ```
 
-## `--reanchor` (평소에는 쓰지 않는다)
+## `--reanchor` (normally never)
 
-부모 저장소는 어디까지 반영했는지 기준 커밋 하나를 기록해 둔다. 서브모듈에서 **강제 푸시로 이력이 재작성되면** 그 기준 커밋이 사라져 워크플로가 멈춘다. `--reanchor`는 그때만 쓴다: 새 이력에서 대응하는 커밋의 SHA를 지정해 기록을 그 위치로 다시 붙인다.
+The parent records one anchor commit to mark how far it has bumped. If a **force-push rewrites the submodule's history**, that anchor disappears from develop and the workflow stops. `--reanchor` is only for that: name the corresponding commit in the new history and it re-attaches the anchor there.
 
-이력이 정상일 때는 붙여도 소용이 없고, **반영 위치를 과거로 되돌리는 데는 쓸 수 없다.** 사용자가 명시적으로 요청할 때만 붙인다: 스스로 판단해서 추가하지 않는다.
+On healthy history it does nothing, and it **cannot move the pin backward.** Add it only when the user explicitly asks: never on your own judgement.
 
 ## Guardrails
 
-- 이 스킬은 **`CUBRID/cubrid`의 `submodule-bump-receiver.yml` 하나만** 실행한다. 다른 워크플로나 저장소를 대상으로 `gh workflow run`을 쓰지 않는다.
-- 허용된 세 서브모듈 밖의 입력은 **gh를 실행하지 않고** 거부한다.
-- 검증(Step 2) 없이 바로 `--run`을 쓰지 않는다.
-- 실패해도 부모 저장소는 바뀌지 않는다. 잘못된 입력은 반영 전에 거부된다.
+- This skill runs **only `submodule-bump-receiver.yml` on `CUBRID/cubrid`**. Never point `gh workflow run` at another workflow or repo.
+- Anything outside the three allowed submodules is refused **without running gh at all**.
+- Never jump to `--run` without the Step 2 validation.
+- A failure leaves the parent repo untouched: bad input is refused before anything is pinned.
