@@ -1,7 +1,7 @@
 ---
-name: cubrid-submodule-bump
-description: "Pin a CUBRID submodule to a specific commit by dispatching the parent repo's 'Submodule bump (receiver)' GitHub Action, which opens or updates the bump PR on CUBRID/cubrid. Takes a submodule (cubrid-jdbc, cubrid-cci, cubridmanager: the short forms jdbc, cci, cms and the repo name cubrid-manager-server also work) and a commit SHA (or 'latest' for that submodule's develop head). Validates the submodule, the SHA, and the direction of the move before anything is dispatched, and shows the exact command for confirmation first. Use when the automatic bump is stuck, when several submodule commits piled up and you want to catch up in one go, or when you need to pin one specific commit. Triggers on phrases like '서브모듈 SHA 반영', 'jdbc 최신으로 올려줘', 'cci SHA 반영해줘', 'submodule bump 실행', 'cubridmanager SHA 바꿔줘'."
-argument-hint: "<jdbc|cci|cms> <sha|latest> [--reanchor]"
+name: submodule-bump
+description: "Pin a CUBRID submodule to a specific commit by dispatching the parent repo's 'Submodule bump (receiver)' GitHub Action, which opens or updates the bump PR on CUBRID/cubrid. Takes a submodule (cubrid-jdbc, cubrid-cci, cubridmanager: the short forms jdbc, cci, cms and the repo name cubrid-manager-server also work) and a commit SHA (or 'latest' for that submodule's develop head). Validates the submodule, the SHA, and the direction of the move before anything is dispatched, and shows the exact command for confirmation first. `--status` is a read-only overview: with no submodule it reports all three (pinned, head, how many commits behind, the open bump PR), and with one it lists that submodule's pending commits so you can pick how far to bump. Use when the automatic bump is stuck, when several submodule commits piled up and you want to catch up in one go, or when you need to pin one specific commit. Triggers on phrases like '서브모듈 상태 확인', '밀린 서브모듈 있나', '서브모듈 SHA 반영', 'jdbc 최신으로 올려줘', 'cci SHA 반영해줘', 'submodule bump 실행', 'cubridmanager SHA 바꿔줘'."
+argument-hint: "[jdbc|cci|cms] <sha|latest|--status> [--reanchor]"
 ---
 
 # Bump a CUBRID submodule to a commit
@@ -9,6 +9,19 @@ argument-hint: "<jdbc|cci|cms> <sha|latest> [--reanchor]"
 Dispatch `submodule-bump-receiver.yml` on `CUBRID/cubrid` so the parent repo pins a submodule to the commit you name. The Action opens a bump PR (or updates the open one). Normally the bump is automatic, one commit per PR; run this only when you need to catch up, pin a specific commit, or restart a stalled bump.
 
 **This triggers a real Action and touches a PR on the main repo.** Never dispatch without showing the user what will happen and getting a yes.
+
+## Step 0: Check the state first (read-only)
+
+```bash
+bash <skill-base-dir>/assets/bump_submodule.sh --status            # 세 개 요약
+bash <skill-base-dir>/assets/bump_submodule.sh <submodule> --status # 그 서브모듈의 밀린 커밋 목록
+```
+
+조회만 하므로 확인 없이 바로 실행해도 된다. 한 번의 호출로 세 서브모듈의 반영 SHA, 최신 SHA, 밀린 개수, 열린 bump PR을 한 번에 보여준다.
+
+**열린 PR이 이미 최신을 담고 있으면 워크플로를 실행할 필요가 없다**: 그 PR을 머지하면 된다. 이 경우 스크립트가 `just merge it`으로 알려주므로, 실행을 권하지 말고 머지를 안내한다.
+
+개별 조회는 부모에 반영된 커밋 **이후** 새로 들어온 커밋만 오래된 순으로 번호를 붙여 보여준다 (20개까지, 넘으면 남은 개수를 명시). 그 번호가 곧 "몇 번째 커밋까지 반영할지"이므로, 사용자가 특정 커밋까지만 원할 때 여기서 SHA를 고른다.
 
 ## Step 1: Resolve the target
 
