@@ -8,6 +8,7 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 |-------|-------------|
 | `skill-create` | Scaffold a new skill in this collection from a workflow you just did |
 | `commit` | Commit staged changes with a clean Conventional Commit subject |
+| `cubrid-submodule-bump` | Pin a CUBRID submodule (cubrid-jdbc / cubrid-cci / cubridmanager) to a commit by dispatching the parent repo's bump Action, with validation before anything is dispatched |
 | `cubrid-manual` | Look up CUBRID engine behavior in the version-pinned online manual |
 | `cmt-manual` | Look up CUBRID Migration Toolkit (CMT) behavior in the online manual |
 | `report` | Generate a CUBRID-house-style Korean analysis report as a Word (.docx): docx-js, Mermaid/SVG diagrams (Kroki) + matplotlib charts, OOXML-validated |
