@@ -14,17 +14,9 @@ Generate a CUBRID-house-style Korean Word report by writing a JSON spec and runn
 - **Bordered tables with row-level color coding**: sky-blue (#D5E8F0) header row, green (#E2EFDA) pass rows, red (#F8D7DA) fail rows, gray (#F2F2F2) neutral-emphasis
 - **Running header** set to the report title; footer page numbers
 
-## Step 0: Ensure dependencies (one-time)
+## Step 0: Dependencies
 
-```bash
-# docx-js: document assembly
-npm list -g docx >/dev/null 2>&1 || npm install -g docx
-# Python venv: chart rendering (matplotlib)
-VENV="$HOME/.cache/claude-skills/report-venv"
-[ -x "$VENV/bin/python" ] || python3 -m venv "$VENV"
-"$VENV/bin/python" -c "import matplotlib" 2>/dev/null || "$VENV/bin/pip" -q install matplotlib
-```
-The document is assembled with **docx-js**; `chart`/`diagram` blocks are rendered by `assets/figures.py` (matplotlib) and embedded as images. Extra tools, needed only when those blocks are used: a `mermaid` block needs `curl` + network to reach **Kroki** (or set `KROKI_URL` to a self-hosted instance; if Kroki is unreachable the block degrades to a code block and the build continues); `svg` blocks and the Step 4 visual verification need **LibreOffice** (`soffice`) and `pdftoppm` (poppler).
+`assets/build.sh` installs what is missing on its own (global `docx`, the matplotlib venv), so there is no separate setup step. The document is assembled with **docx-js**; `chart`/`diagram` blocks are rendered by `assets/figures.py` (matplotlib) and embedded as images. Extra tools, needed only when those blocks are used: a `mermaid` block needs `curl` + network to reach **Kroki** (or set `KROKI_URL` to a self-hosted instance; if Kroki is unreachable the block degrades to a code block and the build continues); `svg` blocks and the Step 4 visual verification need **LibreOffice** (`soffice`) and `pdftoppm` (poppler).
 
 ## Step 1: Identify the report type and gather inputs
 
@@ -104,34 +96,28 @@ Author the SVG yourself, the way the `visualize` tool would: deliberate layout, 
 ## Step 3: Generate the .docx
 
 ```bash
-NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin/python" \
-  node "<skill-base-dir>/assets/build_report.js" <topic>.json <output>.docx
+bash <skill-base-dir>/assets/build.sh <topic>.json <output>.docx
 ```
+
+`build.sh` checks the toolchain and then runs `build_report.js`, so building is one call.
 
 `<skill-base-dir>` is this skill's own directory (shown as its base directory when the skill runs). `build_report.js` calls `figures.py` for `chart`/`diagram` blocks (matplotlib), renders each `mermaid` block to PNG via Kroki (`curl`; override the endpoint with `KROKI_URL`), and rasterizes each `svg` block's PNG fallback via LibreOffice (`soffice`, resolved on PATH → macOS app bundle). Filename convention: `CUBRID_<주제>_<유형>_YYYYMMDD.docx`.
 
 ## Step 4: Validate, visually verify, hand off
 
-**1) OOXML schema validation**: catches a malformed .docx before the user opens it (via Anthropic's docx skill):
+**1) Check and render in one call**:
 
 ```bash
-# one-time: "$VENV/bin/pip" install defusedxml lxml
-"$VENV/bin/python" <docx-skill>/scripts/office/validate.py <output>.docx   # expect "All validations PASSED!"
+bash <skill-base-dir>/assets/preview.sh <output>.docx
 ```
+
+It verifies the .docx structure (zip integrity, required parts, well-formed XML in every part) and then renders every page to PNG, printing the image paths. Read those images. This is a structural check, not full OOXML schema validation.
 
 **2) Visual verification**: render every page to an image and read them, to catch layout issues the schema can't (clipped chart labels, overlapping text, a `note` box merging into a table, broken page breaks, color/table problems). This is the PRIMARY defect-catcher; schema validation cannot see any of these. **Do not skip it whenever `soffice` resolves**: only skip if LibreOffice is genuinely absent (and then say so explicitly).
 
 **Per-diagram check (render → look → fix → repeat)**: when you read the rendered pages, inspect **each figure** specifically: is every node label fully inside its box, no text clipped or overlapping, no shape collision, arrows landing on borders, the whole figure within the page width? If a figure is wrong, fix its block (for `mermaid`: switch `LR`↔`TB`, shorten labels, or adjust `width_in`; for `svg`: resize the box or canvas) and re-run Step 3 + this render, then look again. Repeat until every diagram is clean. Do not hand off a report with a diagram you have not looked at.
 
-```bash
-# Resolve LibreOffice robustly: PATH first (brew/linux), then the macOS .app bundle.
-SOFFICE="$(command -v soffice || command -v libreoffice || true)"
-[ -z "$SOFFICE" ] && [ -x "/Applications/LibreOffice.app/Contents/MacOS/soffice" ] && SOFFICE="/Applications/LibreOffice.app/Contents/MacOS/soffice"
-# if still empty -> install once: brew install --cask libreoffice  (mac) | sudo apt-get install -y libreoffice  (linux)
-"$SOFFICE" --headless -env:UserInstallation=file:///tmp/loprofile --convert-to pdf --outdir /tmp/render <output>.docx
-pdftoppm -png -r 120 "/tmp/render/$(basename <output>.docx .docx).pdf" /tmp/render/page
-# then Read /tmp/render/page-*.png and check cover, TOC, tables, charts, page breaks
-```
+`preview.sh` resolves LibreOffice itself (PATH, then the macOS app bundle) and tells you what to install if it is missing. After a fix, re-run `build.sh` then `preview.sh`: two calls per round.
 
 Note: LibreOffice substitutes 맑은 고딕 if it is not installed locally: the user's Word (with the font) renders correctly; chart text uses AppleGothic baked into the PNGs.
 

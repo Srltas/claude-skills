@@ -8,29 +8,26 @@ argument-hint: "[base-branch] [--tc for CMT unit-test PR]"
 
 Turn the current branch into a ready-to-paste PR title and body, grounded in the real commits and diff. Draft only: it does not create the PR.
 
-## Step 1: Context
-
-- Current branch: `git rev-parse --abbrev-ref HEAD`.
-- **Key**: extract `PROJECT-NUMBER` from the branch name (e.g. `HHH-20527-modernize-...` -> `HHH-20527`). If the branch has no such key, ask the user for it.
-- **Base**: use the first ref that exists, checked with `git rev-parse --verify <ref>`: `upstream/main`, then `origin/main`, then `main`. If `$ARGUMENTS` names a base, use that (`--tc` is a body-template flag, not a base: ignore it here). If still unclear, ask.
-
-## Step 2: Read the changes (grounding)
+## Step 1: Context and changes (one call)
 
 ```bash
-git log <base>..HEAD --oneline
-git diff <base>...HEAD --stat
+bash <skill-base-dir>/assets/pr_context.sh [base-ref]
 ```
 
-Read the key hunks of the diff if needed. Draft from what actually changed, not from memory.
+Prints the branch, the issue key taken from the branch name, the resolved base, the commit list, the changed-file stat, and how many non-test files changed. Pass a base only when the user names one (`--tc` is a body-template flag, not a base).
 
-## Step 3: Title
+It resolves the base from the remote's own default branch, so a `develop`-based CUBRID repo works as well as a `main`-based one. If it reports no key, ask the user for it; if it cannot find a base, ask.
+
+Then read the key hunks of the diff (`git diff <base>...HEAD -- <path>`) where you need detail. Draft from what actually changed, not from memory.
+
+## Step 2: Title
 
 `[XXX-0000] <summary>`
 
 - `[XXX-0000]` is the key from Step 1 (e.g. `[HHH-20527]`, `[CBRD-1234]`).
 - `<summary>` is concise **English** using easy words anyone can understand, one line, no trailing period.
 
-## Step 4: Body (Korean, three sections)
+## Step 3: Body (Korean, three sections)
 
 There are two body templates, and the default one is the default.
 
@@ -101,7 +98,7 @@ mvn -B -Punit-test test             # read "Tests run: N, Failures: 0"
 
 Rules: **Purpose is required.** Implementation and Remarks are optional and become `N/A` when there is nothing to say. **Tone**: write like an open-source developer writing a PR, plain and natural. Avoid 공식 문서투, 격식체, 한자어 남발, 수동태, 논문투, and keep the usual dev loanwords as they are (오버로드, 커밋, 롤백, 엣지 케이스). **Style**: short sentences, one thought each; Purpose follows **문제 -> 한 일 -> 근거**. Skip grand phrasing (e.g. "~를 처음 연다") and over-compression, and spell out only the jargon that needs it. Essentials only. No em-dash (`—`): use commas, colons, parentheses, periods.
 
-## Step 5: Output
+## Step 4: Output
 
 Print the title line and the body as one copy-paste block. **Do not create the PR.** If the user wants to open it, show (and run only when they explicitly ask) the command:
 
