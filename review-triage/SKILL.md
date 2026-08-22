@@ -10,13 +10,9 @@ Pull the review feedback on your PR and, comment by comment, summarize it plainl
 
 ## Step 1: Identify the PR
 
-The current branch's PR by default, or a number/URL from `$ARGUMENTS`.
+The current branch's PR by default, or a number/URL from `$ARGUMENTS`. **No separate lookup is needed**: Step 2 prints the title, base, and body along with the reviews.
 
-```bash
-gh pr view --json number,url,title,body,headRefName,baseRefName   # current branch's PR
-```
-
-Read the title and body: they state **what this PR set out to do**, which Step 3 judges scope against. If the body links an issue (CBRD, APIS, TOOLS, CUBRIDQA, HHH), pull it too (**jira-fetch** for CUBRID Jira Server keys) so the PR's intent comes from the issue, not from a guess.
+Those state **what this PR set out to do**, which Step 3 judges scope against. If the body links an issue (CBRD, APIS, TOOLS, HHH), pull it too (**jira-fetch** for CUBRID Jira Server keys, publicly readable projects only) so the PR's intent comes from the issue, not from a guess.
 
 ## Step 2: Fetch the reviews
 

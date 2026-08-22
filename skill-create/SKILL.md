@@ -91,8 +91,7 @@ Skills are matched by their description and trigger phrases, so vague writing he
 ## Step 9: Install, verify, commit
 
 ```bash
-just install
-just list | grep <frontmatter-name>
+just install && just list | grep <frontmatter-name>
 ```
 
 `just list` prints frontmatter `name:` values, so grep the name set in the SKILL.md. If it appears, propose committing (match the style of `git log --oneline -10`):

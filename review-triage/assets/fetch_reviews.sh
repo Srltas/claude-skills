@@ -10,6 +10,13 @@ set -uo pipefail
 command -v gh >/dev/null 2>&1 || { echo "error: gh (GitHub CLI) not found" >&2; exit 2; }
 command -v jq >/dev/null 2>&1 || { echo "error: jq not found" >&2; exit 2; }
 
+# gh api prints its error body on stdout when a request fails, so capture and discard it.
+api_or_none() {
+  local out
+  out="$(gh api "$1" --paginate --jq "$2" 2>/dev/null)" || { echo "(none)"; return 0; }
+  if [ -n "$out" ]; then printf '%s\n' "$out"; else echo "(none)"; fi
+}
+
 PR=""
 INCLUDE_RESOLVED=0
 for a in "$@"; do
@@ -37,7 +44,13 @@ else
 fi
 
 echo "# PR #$N  ($REPO)"
-gh pr view "$N" --repo "$REPO" --json title,author,url -q '"title: \(.title)\nauthor: \(.author.login)\nurl: \(.url)"' 2>/dev/null || true
+# Title, author, base and body in the same call: Step 3 judges scope against the PR's own intent,
+# so fetching it separately would just repeat this lookup.
+gh pr view "$N" --repo "$REPO" --json title,author,url,baseRefName,body \
+  -q '"title: \(.title)\nauthor: \(.author.login)\nbase: \(.baseRefName)\nurl: \(.url)"' 2>/dev/null || true
+echo
+echo "## PR intent (body)"
+gh pr view "$N" --repo "$REPO" --json body -q .body 2>/dev/null | head -40 || echo "(none)"
 
 # Resolution lives only on the review THREAD, and only in GraphQL: the REST comment payload has no
 # resolved field. Collect the comment ids of resolved threads so they can be skipped.
@@ -75,13 +88,13 @@ gh api "repos/$REPO/pulls/$N/comments" --paginate 2>/dev/null | jq -r --argjson 
 
 echo
 echo "## Review summaries"
-gh api "repos/$REPO/pulls/$N/reviews" --paginate --jq '
+api_or_none "repos/$REPO/pulls/$N/reviews" '
   .[] | select(.state != "PENDING") | select(((.body // "") | length) > 0 or .state == "APPROVED" or .state == "CHANGES_REQUESTED")
   | "\n[review \(.state)] \(.user.login) (\(.user.type))\n\(.body // "")"
-' 2>/dev/null || echo "(none)"
+' 
 
 echo
 echo "## PR-level comments"
-gh api "repos/$REPO/issues/$N/comments" --paginate --jq '
+api_or_none "repos/$REPO/issues/$N/comments" '
   .[] | "\n[comment #\(.id)] \(.user.login) (\(.user.type))\n\(.body)"
-' 2>/dev/null || echo "(none)"
+' 

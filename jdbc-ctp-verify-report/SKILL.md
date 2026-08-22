@@ -43,7 +43,7 @@ Follow the report skill's schema + 작성 원칙. Default `meta` = `CUBRID Dev1 
 
 ## Step 4: Generate, validate, verify (MANDATORY)
 ```bash
-NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin/python" \
-  node ~/.claude/skills/report/assets/build_report.js <spec>.json <out>.docx
+bash ~/.claude/skills/report/assets/build.sh   <spec>.json <out>.docx
+bash ~/.claude/skills/report/assets/preview.sh <out>.docx
 ```
-Then validate (OOXML) + visually verify (LibreOffice render) per the report skill's Step 4. Hand the user the `.docx` path + `ctp-out/`.
+`build.sh` handles the toolchain; `preview.sh` checks the structure and renders every page to PNG. **Read those page images** before handing off (report skill Step 4). Hand the user the `.docx` path + `ctp-out/`.

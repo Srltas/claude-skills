@@ -49,8 +49,8 @@ Follow the report skill's schema + 작성 원칙 (간결, 표/차트 우선). De
 ## Step 4: Generate, validate, visually verify (MANDATORY)
 
 ```bash
-NODE_PATH="$(npm root -g)" REPORT_PY="$HOME/.cache/claude-skills/report-venv/bin/python" \
-  node ~/.claude/skills/report/assets/build_report.js <spec>.json <out>.docx
+bash ~/.claude/skills/report/assets/build.sh   <spec>.json <out>.docx
+bash ~/.claude/skills/report/assets/preview.sh <out>.docx
 ```
 
-Then validate (OOXML) and visually verify (LibreOffice render → page images) as in the report skill's Step 4. Hand the user the `.docx` path and `verify-out/summary.json`.
+`build.sh` handles the toolchain; `preview.sh` checks the file's structure and renders every page to PNG. **Read those page images** before handing off (report skill Step 4). Hand the user the `.docx` path and `verify-out/summary.json`.

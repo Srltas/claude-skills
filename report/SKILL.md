@@ -113,7 +113,7 @@ bash <skill-base-dir>/assets/preview.sh <output>.docx
 
 It verifies the .docx structure (zip integrity, required parts, well-formed XML in every part) and then renders every page to PNG, printing the image paths. Read those images. This is a structural check, not full OOXML schema validation.
 
-**2) Visual verification**: render every page to an image and read them, to catch layout issues the schema can't (clipped chart labels, overlapping text, a `note` box merging into a table, broken page breaks, color/table problems). This is the PRIMARY defect-catcher; schema validation cannot see any of these. **Do not skip it whenever `soffice` resolves**: only skip if LibreOffice is genuinely absent (and then say so explicitly).
+**2) Visual verification**: render every page to an image and read them, to catch layout issues the schema can't (clipped chart labels, overlapping text, a `note` box merging into a table, broken page breaks, color/table problems). This is the PRIMARY defect-catcher; the structure check cannot see any of these. **Do not skip it whenever `soffice` resolves**: only skip if LibreOffice is genuinely absent (and then say so explicitly).
 
 **Per-diagram check (render → look → fix → repeat)**: when you read the rendered pages, inspect **each figure** specifically: is every node label fully inside its box, no text clipped or overlapping, no shape collision, arrows landing on borders, the whole figure within the page width? If a figure is wrong, fix its block (for `mermaid`: switch `LR`↔`TB`, shorten labels, or adjust `width_in`; for `svg`: resize the box or canvas) and re-run Step 3 + this render, then look again. Repeat until every diagram is clean. Do not hand off a report with a diagram you have not looked at.
 
