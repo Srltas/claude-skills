@@ -77,6 +77,20 @@ def builds_of_job(repo, job, limit=100):
     return [b for b in (d or []) if (b.get("workflows") or {}).get("job_name") == job]
 
 
+def builds_of_job_on_pr(repo, pr, job, limit=30):
+    """This PR's own earlier runs. The project-wide list only reaches back about a day, so
+    an earlier run of the same PR must be read from the PR branch itself: missing it makes a
+    flaky test look PR-specific."""
+    branch = f"pull%2F{pr}%2Fhead"
+    d = api(f"https://circleci.com/api/v1.1/project/github/{repo}/tree/{branch}?filter=completed&limit={limit}")
+    return [b for b in (d or []) if (b.get("workflows") or {}).get("job_name") == job]
+
+
+def build_revision(repo, build):
+    d = api(f"https://circleci.com/api/v1.1/project/github/{repo}/{build}")
+    return (d or {}).get("vcs_revision") or ""
+
+
 def excerpt(msg, lines=6):
     """The interesting part of a shell-TC failure: the NOK / diff lines."""
     keep = [ln for ln in msg.splitlines() if re.search(r"NOK|failed|Error|error:|diff ", ln)]
@@ -156,31 +170,41 @@ def main():
 
         others = [b for b in builds_of_job(repo, job)
                   if b["build_num"] != build and f"pull/{pr}" not in (b.get("branch") or "")]
-        same_pr = [b for b in builds_of_job(repo, job)
-                   if b["build_num"] != build and f"pull/{pr}" in (b.get("branch") or "")]
+        same_pr = [b for b in builds_of_job_on_pr(repo, pr, job) if b["build_num"] != build]
         sample = others[:SAMPLE]
         print(f"  compared against {len(sample)} recent run(s) on other PRs"
-              + (f" and {len(same_pr[:3])} earlier run(s) of this PR" if same_pr else ""))
+              + (f" and {len(same_pr[:3])} earlier run(s) of this PR" if same_pr else " (no earlier run of this PR)"))
 
-        seen_fail, seen_ok = {}, {}
+        # Evidence from an earlier run of the SAME commit outranks everything else: the code was
+        # identical, so a differing result can only be flakiness.
+        rev = build_revision(repo, build)
+        ev = {t: {"same_ok": 0, "fail": 0, "ok": 0} for t in mine}
         for b in sample + same_pr[:3]:
             bad, _, _, _ = failing_tests(repo, b["build_num"])
             if bad is None:
                 continue
+            same_commit = bool(rev) and b.get("vcs_revision") == rev
             for t in mine:
-                (seen_fail if t in bad else seen_ok)[t] = (seen_fail if t in bad else seen_ok).get(t, 0) + 1
+                if t in bad:
+                    ev[t]["fail"] += 1
+                else:
+                    ev[t]["ok"] += 1
+                    if same_commit:
+                        ev[t]["same_ok"] += 1
 
-        common, unique, flaky = [], [], []
+        common, unique, flaky, unknown = [], [], [], []
         for t in sorted(mine):
-            f, o = seen_fail.get(t, 0), seen_ok.get(t, 0)
-            if f and o:
-                flaky.append((t, f, o))
-            elif f:
-                common.append((t, f))
-            elif o:
+            e = ev[t]
+            if e["same_ok"]:
+                flaky.append((t, e["fail"], e["ok"], True))
+            elif e["fail"] and e["ok"]:
+                flaky.append((t, e["fail"], e["ok"], False))
+            elif e["fail"]:
+                common.append((t, e["fail"]))
+            elif e["ok"]:
                 unique.append(t)
             else:
-                unique.append(t)          # no evidence elsewhere: treat as PR-specific
+                unknown.append(t)
 
         def show(title, rows, fmt):
             print(f"\n  [{title}] {len(rows)}")
@@ -190,8 +214,11 @@ def main():
                 print(f"    ... and {len(rows)-12} more")
 
         show("공통 (다른 PR에서도 실패, 이 PR 무관)", common, lambda r: f"{r[0]}  (다른 실행 {r[1]}건에서도 실패)")
-        show("flaky (실행마다 결과가 갈림)", flaky, lambda r: f"{r[0]}  (실패 {r[1]} / 성공 {r[2]})")
+        show("flaky (실행마다 결과가 갈림)", flaky,
+             lambda r: f"{r[0]}  (실패 {r[1]} / 성공 {r[2]})" + ("  ** 동일 커밋에서 통과한 적 있음 **" if r[3] else ""))
         show("고유 (여기서만 실패)", unique, lambda t: t)
+        if unknown:
+            show("판정 불가 (비교 표본에 근거 없음)", unknown, lambda t: t)
 
         for t in unique[:5]:
             print(f"\n  --- {t}")
@@ -199,10 +226,14 @@ def main():
                 print("      " + ln[:160])
 
         print("\n  판단:")
+        confirmed = [f for f in flaky if f[3]]
         if not mine:
             print("    잡은 실패했는데 실패한 TC가 없다. 인프라·타임아웃 등 테스트 외 원인이므로 CircleCI 로그를 볼 것.")
         elif unique:
             print("    이 PR에서만 실패한 TC가 있다. 서브모듈 변경 내용과 대조해 실제 원인을 확인할 것.")
+        elif confirmed:
+            print(f"    {len(confirmed)}건이 동일 커밋({rev[:7]})에서 통과한 적이 있다: 확정 flaky.")
+            print("    재실행이 유효하다. base 업데이트는 이 실패와 무관하다.")
         elif flaky and not common:
             print("    간헐적 실패로 보인다. 재실행이 유효하다.")
         elif common and not flaky:
