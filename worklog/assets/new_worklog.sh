@@ -24,7 +24,12 @@ if printf '%s' "$KEY" | grep -qiE "${key_re}(-.*)?$"; then
   name="$title$tail"
   [ -n "$SLUG" ] && name="$name-$SLUG"
 else
-  title="$(printf '%s' "$KEY" | tr '[:upper:]' '[:lower:]')"       # topic (no issue key)
+  # topic (no issue key): sanitize, or a Korean/spaced topic becomes a directory with spaces
+  # and 'a/b' would create stray nested directories after mkdir -p.
+  title="$(printf '%s' "$KEY" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9._-' \
+           | sed -E 's/-+/-/g; s/^[-._]+//; s/[-._]+$//')"
+  printf '%s' "$title" | grep -qE '[a-z0-9]' || {
+    echo "error: topic must be an issue key (CBRD-1234) or ASCII kebab-case (got '$KEY')." >&2; exit 2; }
   folder="$title"; name="$title"; [ -n "$SLUG" ] && name="$title-$SLUG"
 fi
 

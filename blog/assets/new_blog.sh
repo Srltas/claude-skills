@@ -11,9 +11,16 @@ SLUG="${1:?usage: new_blog.sh <slug>}"
 [ -d "$REPO/.git" ] || { echo "error: docs repo not found at $REPO — clone your public work-docs repo there, or set WORK_DOCS_REPO." >&2; exit 2; }
 [ -f "$TEMPLATE" ] || { echo "error: template missing: $TEMPLATE" >&2; exit 2; }
 
-slugify() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9._-'; }
+# ASCII kebab-case. Spaces become hyphens BEFORE non-ASCII is dropped, so a Korean input can
+# otherwise survive as a string of bare hyphens and pass a non-empty check ("한글 슬러그" -> "--").
+# Collapse and trim them, then require at least one alphanumeric.
+slugify() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9._-' \
+    | sed -E 's/-+/-/g; s/^[-._]+//; s/[-._]+$//'
+}
+valid_slug() { printf '%s' "$1" | grep -qE '[a-z0-9]'; }
 slug_l="$(slugify "$SLUG")"
-[ -n "$slug_l" ] || { echo "error: empty slug after sanitizing" >&2; exit 2; }
+valid_slug "$slug_l" || { echo "error: slug must be ASCII kebab-case (got '$SLUG'). Korean goes in the post body, not the folder name." >&2; exit 2; }
 
 date_s="$(date +%F)"
 rel="blog/$date_s-$slug_l"

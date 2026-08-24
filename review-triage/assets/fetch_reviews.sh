@@ -39,8 +39,11 @@ if [ -z "$PR" ]; then
   N="$(gh pr view --json number -q .number 2>/dev/null || true)"
   [ -n "$N" ] || { echo "error: no PR found for the current branch. Pass a PR number or URL." >&2; exit 2; }
 else
-  N="$(printf '%s' "$PR" | grep -oE '[0-9]+' | tail -1)"
-  [ -n "$N" ] || { echo "error: could not parse a PR number from '$PR'" >&2; exit 2; }
+  # Take the number after /pull/, not the last number in the string: a review permalink
+  # (.../pull/6055#discussion_r2345678) would otherwise yield the comment id.
+  N="$(printf '%s' "$PR" | sed -nE 's#^.*/pulls?/([0-9]+).*$#\1#p')"
+  [ -n "$N" ] || N="$(printf '%s' "$PR" | grep -oE '^[0-9]+$' || true)"
+  [ -n "$N" ] || { echo "error: could not parse a PR number from '$PR' (use a number or a /pull/<n> URL)" >&2; exit 2; }
 fi
 
 echo "# PR #$N  ($REPO)"

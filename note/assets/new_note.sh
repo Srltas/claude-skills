@@ -13,11 +13,19 @@ SLUG="${2:?usage: new_note.sh <category> <slug>}"
 [ -d "$REPO/.git" ] || { echo "error: docs repo not found at $REPO — clone your public work-docs repo there, or set WORK_DOCS_REPO." >&2; exit 2; }
 [ -f "$TEMPLATE" ] || { echo "error: template missing: $TEMPLATE" >&2; exit 2; }
 
-slugify() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9._-'; }
+# ASCII kebab-case. Spaces become hyphens BEFORE non-ASCII is dropped, so a Korean input can
+# otherwise survive as a string of bare hyphens and pass a non-empty check ("한글 슬러그" -> "--").
+# Collapse and trim them, then require at least one alphanumeric.
+slugify() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9._-' \
+    | sed -E 's/-+/-/g; s/^[-._]+//; s/[-._]+$//'
+}
+valid_slug() { printf '%s' "$1" | grep -qE '[a-z0-9]'; }
 cat_l="$(slugify "$CATEGORY")"
 slug_l="$(slugify "$SLUG")"
-[ -n "$cat_l" ]  || { echo "error: empty category after sanitizing" >&2; exit 2; }
-[ -n "$slug_l" ] || { echo "error: empty slug after sanitizing" >&2; exit 2; }
+valid_slug "$cat_l" || { echo "error: category must be ASCII kebab-case (got '$CATEGORY'). Korean goes in the note body, not the path." >&2; exit 2; }
+valid_slug "$slug_l" || { echo "error: slug must be ASCII kebab-case (got '$SLUG'). Korean goes in the note body, not the filename." >&2; exit 2; }
+case "$cat_l" in .|..|*/*) echo "error: bad category '$cat_l'" >&2; exit 2;; esac
 
 date_s="$(date +%F)"
 rel="$cat_l/$date_s-$slug_l.md"

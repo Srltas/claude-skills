@@ -41,16 +41,35 @@ echo "· jar: $JAR" >&2
 
 if [ -n "$SCOPE" ]; then
   FILES=()
+  # git reports paths relative to the repo root, so run from there: called in a subdirectory the
+  # paths would not resolve and every file would be silently unreadable.
+  if [ "$SCOPE" = changed ] || [ "$SCOPE" = staged ] || [ "$SCOPE" = all ]; then
+    ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+    [ -n "$ROOT" ] && cd "$ROOT"
+  fi
   if [ "$SCOPE" = changed ]; then
+    [ -n "$ROOT" ] || { echo "error: 'changed' needs a git repository" >&2; exit 2; }
     while IFS= read -r f; do [ -n "$f" ] && FILES+=("$f"); done < <(git diff --name-only --diff-filter=ACM -- '*.java')
   elif [ "$SCOPE" = staged ]; then
+    [ -n "$ROOT" ] || { echo "error: 'staged' needs a git repository" >&2; exit 2; }
     while IFS= read -r f; do [ -n "$f" ] && FILES+=("$f"); done < <(git diff --cached --name-only --diff-filter=ACM -- '*.java')
   elif [ "$SCOPE" = all ]; then
-    while IFS= read -r f; do [ -n "$f" ] && FILES+=("$f"); done < <(find . -name '*.java')
+    # tracked sources only: a bare find also sweeps build output (target/, build/), which is
+    # thousands of generated files in a big checkout.
+    if [ -n "$ROOT" ]; then
+      while IFS= read -r f; do [ -n "$f" ] && FILES+=("$f"); done < <(git ls-files '*.java')
+    else
+      while IFS= read -r f; do [ -n "$f" ] && FILES+=("$f"); done < <(
+        find . \( -path '*/target/*' -o -path '*/build/*' -o -path '*/.git/*' \) -prune -o -name '*.java' -print)
+    fi
   fi
 fi
 [ "${#FILES[@]}" -gt 0 ] || { echo "no .java files for scope '${SCOPE:-files}'"; exit 0; }
 
 echo "· formatting ${#FILES[@]} file(s) with google-java-format $VER (AOSP, in place)" >&2
-printf '%s\0' "${FILES[@]}" | xargs -0 java -jar "$JAR" -a -r
-echo "done: ${#FILES[@]} file(s)"
+# Report the formatter's own status: a trailing echo would mask a total failure as success.
+if ! printf '%s\0' "${FILES[@]}" | xargs -0 java -jar "$JAR" -a -r; then
+  echo "error: google-java-format failed; files may be partially formatted (check the output above)" >&2
+  exit 1
+fi
+echo "done: ${#FILES[@]} file(s) processed"
