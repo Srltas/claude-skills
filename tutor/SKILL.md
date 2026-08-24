@@ -2,6 +2,7 @@
 name: tutor
 description: "Manual, /tutor-only deep-learning tutor. Invoke ONLY when the user explicitly runs /tutor; do NOT trigger automatically (it is verbose by design and would waste tokens if auto-fired). Acts as a patient expert teacher for the current work or a named topic, starting from zero assumed terminology: it defines every term first, then teaches the concept step by step (big picture, core concepts, details with real examples, summary), grounded in the actual code and manuals, and ends with comprehension checks. Korean, and adaptive to follow-ups like 'easier / deeper / again / more examples'."
 argument-hint: "[topic; empty = the current work in view]"
+disable-model-invocation: true
 ---
 
 # Tutor: learn the current work from zero

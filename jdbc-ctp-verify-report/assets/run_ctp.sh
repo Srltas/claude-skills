@@ -44,17 +44,36 @@ done
 CONF="${CONF:-$CTP_HOME/conf/jdbc.conf}"
 mkdir -p "$OUT"
 
-# --- self-cleanup: on exit, prune orphaned anonymous CUBRID test-DB volumes left behind
-#     by recreated containers (dangling=true skips volumes attached to any running OR
-#     stopped container; the 64-hex filter preserves named volumes like jenkins_jenkins-data).
+# The CTP run overwrites $CTP_HOME/result, so a baseline pointing there would be re-parsed from
+# post-run XML and every diff would come out +0/-0. Resolve it first, and refuse that path.
+RES="$CTP_HOME/result/jdbc/current_runtime_logs"
+case "$(cd "$(dirname "$BASELINE")" 2>/dev/null && pwd || echo "$BASELINE")" in
+  "$CTP_HOME/result"*) echo "ERROR: --baseline points inside $CTP_HOME/result, which this run overwrites." >&2
+                       echo "       Use a saved baseline.json (or a copy taken before the run)." >&2; exit 2;;
+esac
+case "$BASELINE" in
+  *.json) cp "$BASELINE" "$OUT/baseline.json";;
+  *) python3 "$PARSE" parse "$BASELINE" "$OUT/baseline.json" >/dev/null;;
+esac
+echo "baseline: $BASELINE -> $OUT/baseline.json"
+
+# --- self-cleanup: on exit, prune anonymous volumes THIS RUN left behind.
+#     Scoped by a before/after snapshot: a dangling anonymous volume is removed only if it did
+#     not exist when the script started. Without that snapshot the dangling+64-hex filter matches
+#     every project's orphaned volume on the machine, not just CUBRID test DBs.
 #     Disable with --no-cleanup.
 CLI="$(command -v docker || command -v podman || echo docker)"
+VOLS_BEFORE="$("$CLI" volume ls -q 2>/dev/null | sort || true)"
 cleanup_orphans() {
   [ "$CLEANUP" -eq 1 ] || return 0
   local vols
-  vols="$("$CLI" volume ls -qf dangling=true 2>/dev/null | grep -E '^[0-9a-f]{64}$' || true)"
-  [ -n "$vols" ] || return 0
-  echo "cleanup: removing $(printf '%s\n' "$vols" | wc -l | tr -d ' ') orphaned anonymous volume(s)"
+  local dangling
+  dangling="$("$CLI" volume ls -qf dangling=true 2>/dev/null | grep -E '^[0-9a-f]{64}$' | sort || true)"
+  [ -n "$dangling" ] || return 0
+  # only the ones that appeared during this run
+  vols="$(comm -13 <(printf '%s\n' "$VOLS_BEFORE") <(printf '%s\n' "$dangling") || true)"
+  [ -n "$vols" ] || { echo "cleanup: no volume created by this run is dangling; nothing removed"; return 0; }
+  echo "cleanup: removing $(printf '%s\n' "$vols" | wc -l | tr -d ' ') anonymous volume(s) created by this run"
   printf '%s\n' "$vols" | xargs -r "$CLI" volume rm >/dev/null 2>&1 || true
 }
 trap cleanup_orphans EXIT
@@ -77,15 +96,15 @@ echo "deployed → $CUBRID_DIR/jdbc/cubrid_jdbc.jar"
 echo "===== CTP run ====="
 "$CTP_HOME/bin/ctp.sh" jdbc -c "$CONF" 2>&1 | tee "$OUT/ctp.log" || true
 
-# --- 4. parse results ---
-RES="$CTP_HOME/result/jdbc/current_runtime_logs"
+# --- 4. parse results (baseline was resolved before the run) ---
 python3 "$PARSE" parse "$RES" "$OUT/after.json"
-
-# --- 5. resolve baseline → baseline.json ---
-case "$BASELINE" in
-  *.json) cp "$BASELINE" "$OUT/baseline.json";;
-  *) python3 "$PARSE" parse "$BASELINE" "$OUT/baseline.json" >/dev/null;;
-esac
+python3 - "$OUT/after.json" <<'EOF' || exit 2
+import json,sys
+d=json.load(open(sys.argv[1]))
+if not d.get("total"):
+    print("ERROR: CTP produced no parsed cases (total=0). Not writing a report from an empty run;",
+          "see ctp.log.", file=sys.stderr); sys.exit(2)
+EOF
 
 # --- 6. diff ---
 echo "===== diff (baseline → after) ====="

@@ -18,17 +18,19 @@ Build the CUBRID JDBC driver, run the **CTP** JDBC suite against CUBRID, diff vs
 
 ```bash
 bash <skill-base-dir>/assets/run_ctp.sh \
-  --baseline ~/Devel/JDBC/jdbc-verification/cubrid-testtools/CTP/result/jdbc/current_runtime_logs \
+  --baseline ctp-out/baseline.json \
   --cubrid "$CUBRID"            # add --no-build to reuse the deployed jar
 ```
 
 It builds the driver (`./build.sh`), deploys `cubrid_jdbc.jar` to `$CUBRID/jdbc/`, runs `ctp.sh jdbc`, parses `result/jdbc/current_runtime_logs/test-jdbc.xml`, and diffs vs the baseline. Writes `ctp-out/after.json`, `baseline.json`, `diff.txt`.
 
+**The baseline must come from before this run.** The CTP run overwrites `$CTP_HOME/result`, so a `--baseline` pointing inside it would be re-parsed from the same post-run XML and every diff would read `+0 / -0`. The script resolves the baseline **before** running CTP and hard-errors on that path. Keep a saved `baseline.json` from the previous run (`ctp-out/baseline.json` or a copy taken beforehand). If the run parses zero cases, it exits non-zero instead of producing a report from an empty result.
+
 The **change under test** is in the working tree: a driver code change, or a build-target change (the javac `source`/`target` in `JDBC/devel/build.xml`, e.g. 1.6→1.8 for the "Java 8 build impact" case). For a before/after diff, capture the baseline build first, then apply the change and re-run.
 
 (Baseline may be a `.json` from a prior `parse`, a CTP `current_runtime_logs` dir, or a `test-jdbc.xml`. CTP also writes `test_status.data` with `total_*_case_count` for a quick sanity count.)
 
-On exit the script **prunes orphaned anonymous CUBRID test-DB volumes** (those attached to no container; named volumes like `jenkins_jenkins-data` are preserved) so leftover test databases don't accumulate. Pass `--no-cleanup` to skip.
+On exit the script prunes anonymous volumes **that this run created** and that are attached to no container, so leftover test databases do not accumulate. It snapshots the volume list at start and removes only ids that appeared afterwards: volumes that already existed, and named volumes, are never touched. Pass `--no-cleanup` to skip.
 
 ## Step 2: Read the diff/summary
 From `ctp-out/diff.txt` + `after.json`: total/passed/failed, **+N recovered / −N regressed**, and the regressed cases by family (verify-error, conversion, broker/env, classpath/compat, NPE, …).
