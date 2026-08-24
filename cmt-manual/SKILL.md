@@ -2,6 +2,13 @@
 name: cmt-manual
 description: "Look up CUBRID Migration Toolkit (CMT) behavior in the official online manual at www.cubrid.org/cmt_manual: source database support (Oracle, MySQL, MariaDB, MSSQL, Informix, Tibero, and more), data type mapping, migration wizard steps, console/CLI mode, reports, and configuration. Use when migrating a database to CUBRID and you need to verify what CMT supports, how a source type maps to CUBRID, or how a CMT option or console command works. For CUBRID engine SQL/JDBC questions, use the cubrid-manual skill instead. Triggers on phrases like 'CMT', 'CUBRID Migration Toolkit', 'migrate X to CUBRID', 'CMT type mapping', 'how does CMT handle', 'CMT console mode'."
 argument-hint: "<CMT topic to look up>"
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - WebFetch
+  - WebSearch
+  - ToolSearch
 ---
 
 # CMT (CUBRID Migration Toolkit) manual lookup (online)

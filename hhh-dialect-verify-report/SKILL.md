@@ -2,6 +2,7 @@
 name: hhh-dialect-verify-report
 description: "One-shot CUBRID dialect verification + report. Runs the hibernate-core test suite against one or ALL CUBRID versions, diffs pass/fail vs a baseline (a prior run's JSON, results dir, or .tgz), and ALWAYS produces a Korean Word (.docx) 비교 분석 report. Use when you want the full 'verify → measure → report' pipeline for a CUBRIDDialect change in one go, or to test across all CUBRID versions. Composes the hhh-dialect-verify and report skills. Triggers on phrases like 'dialect 검증하고 리포트까지', 'CUBRID 전체 버전 테스트 + 보고서', 'verify the dialect and write the report', 'run all CUBRID versions and report'."
 argument-hint: "--baseline <json|tgz|dir> [--all-versions | --versions 10.2,11.4] [--tests <filter>]"
+disable-model-invocation: true
 ---
 
 # CUBRID dialect verify → report (one-shot)

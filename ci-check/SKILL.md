@@ -2,6 +2,11 @@
 name: ci-check
 description: "Check a CUBRID PR's CI and, when a test job failed, work out whether it is your change, a project-wide failure, or a flaky test. Reads the PR's checks, pulls the failing tests from CircleCI, and classifies each one against recent runs of the same job on other PRs: 공통 (fails elsewhere too, not yours), flaky (result flips between runs), 고유 (fails only here). Also reports how far the PR's base is behind develop, and shows the failure output for the PR-specific ones. Answers 're-run, update the base, or actually investigate?'. Analysis only: it does not re-run CI or push anything. Triggers on phrases like 'CI 왜 깨졌어', 'CI 실패 원인 확인', '이 PR CI 확인해줘', 'flaky인지 봐줘', '재실행하면 되는지 확인', 'why did CI fail on this PR'."
 argument-hint: "[PR number or URL]"
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
 ---
 
 # Triage a CUBRID PR's CI failure

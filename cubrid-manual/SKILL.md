@@ -2,6 +2,13 @@
 name: cubrid-manual
 description: "Look up CUBRID engine behavior in the official online manual: SQL syntax, built-in functions, data types, identifiers and reserved keywords, configuration parameters, and JDBC/driver APIs. Fetches the version-pinned manual at www.cubrid.org/manual. Use when you need to verify CUBRID SQL semantics, a function signature, a data type's range, whether a word is reserved, or a config parameter before writing dialect or JDBC code. For CUBRID Migration Toolkit (CMT) questions, use the cmt-manual skill instead. Triggers on phrases like 'how does X work in CUBRID', 'CUBRID syntax for', 'is X a reserved word in CUBRID', 'what functions does CUBRID have', 'check the CUBRID manual'."
 argument-hint: "[version e.g. 10.2 or 11.4] <topic to look up>"
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - WebFetch
+  - WebSearch
+  - ToolSearch
 ---
 
 # CUBRID manual lookup (online)

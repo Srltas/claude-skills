@@ -2,6 +2,7 @@
 name: jdbc-ctp-verify-report
 description: "One-shot CUBRID JDBC driver verification + report. Builds the CUBRID JDBC driver, runs the CTP JDBC test suite against CUBRID, diffs pass/fail vs a baseline (a prior run's JSON, CTP result dir, or test-jdbc.xml), classifies broken cases (VerifyError, conversion, broker/env, …), and ALWAYS produces a Korean Word (.docx) 비교 분석 report. Use to verify a JDBC driver change or a Java-version/build-target change (e.g. v50 1.6 vs v52 1.8) end to end. Composes parse_ctp.py + the report skill. Triggers on phrases like 'JDBC 드라이버 검증', 'CTP 돌려', 'ctp jdbc 실행하고 리포트', 'verify the JDBC driver with CTP', 'build driver and run CTP'."
 argument-hint: "--baseline <json|result-dir|test-jdbc.xml> [--no-build] [--cubrid <path>]"
+disable-model-invocation: true
 ---
 
 # CUBRID JDBC driver verify (CTP) → report (one-shot)
