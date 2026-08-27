@@ -21,6 +21,7 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `blog` | Draft a Korean tech blog post for velog (minimal text, visuals-first): scaffolds `work-docs/blog/<date>-<slug>/`, renders diagrams to images via Kroki (velog can't render Mermaid) + matplotlib charts |
 | `java-format` | Apply google-java-format (AOSP, in place) to changed / staged / all / specific Java files; asks the version, resolves the jar via `GJF_JAR`/`GJF_DIR`/cache or auto-downloads it |
 | `pr-draft` | Draft a PR title (`[XXX-0000]` + easy English) and Korean body (Purpose / Implementation / Remarks) from the current branch's commits and diff; draft only |
+| `self-review` | Review your own in-progress change as a hostile reviewer before any PR exists: gathers the contract (issue AC, commits, sibling conventions), runs nine passes in parallel subagents, and reports what you missed. Analysis only |
 | `review-triage` | Fetch your PR's review comments (human + bot), judge each against the real code, and draft a Korean summary + fix plan (valid) or reasoned reply (not valid); analysis only |
 | `ci-check` | Triage a CUBRID PR's CI: classify each failing CircleCI test as 공통 / flaky / 고유 against other PRs' runs, report base staleness, and say whether to re-run, update the base, or investigate |
 | `weekly-report` | Turn a list of JIRA issue keys into one short Korean line per issue (via jira-fetch), ready to paste into the weekly-report sheet |
