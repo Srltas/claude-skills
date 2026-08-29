@@ -11,11 +11,11 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `submodule-bump` | Show what each CUBRID submodule is pinned to and what is pending (`--status`), and pin one (cubrid-jdbc / cubrid-cci / cubridmanager) to a commit by dispatching the parent repo's bump Action, with validation before anything is dispatched |
 | `cubrid-manual` | Look up CUBRID engine behavior in the version-pinned online manual |
 | `cmt-manual` | Look up CUBRID Migration Toolkit (CMT) behavior in the online manual |
-| `report` | Generate a CUBRID-house-style Korean analysis report as a Word (.docx): docx-js, Mermaid/SVG diagrams (Kroki) + matplotlib charts, OOXML-validated |
+| `report` | Generate a CUBRID-house-style Korean analysis report as a Word (.docx): docx-js, Mermaid/SVG diagrams (Kroki) + matplotlib charts, with a structure check and a page-by-page visual render |
 | `hhh-dialect-verify` | Run the hibernate-core suite against CUBRID, diff pass/fail vs a baseline, classify failures by family |
 | `hhh-dialect-verify-report` | One-shot: run the suite (one/all CUBRID versions) → diff vs a baseline → always write the .docx report |
 | `jdbc-ctp-verify-report` | One-shot: build the CUBRID JDBC driver → run the CTP suite → diff vs a baseline → classify → always write the .docx report |
-| `jira-fetch` | Download a Jira Server issue (e.g. CUBRID CBRD) to a local Markdown file and load it as working context (wraps `Srltas/jira-to-md-downloader`; Atlassian Cloud not supported as-is) |
+| `jira-fetch` | Download a Jira Server issue (e.g. CUBRID CBRD) to a local Markdown file and load it as working context (wraps `Srltas/jira-to-md-downloader`; publicly readable CUBRID projects only, internal ones such as CUBRIDQA return 401; Atlassian Cloud not supported as-is) |
 | `jira-draft` | Draft a CUBRID JIRA issue (bug/task) as copy-paste text: concise English title, Korean 개조식 body under English section headers. The reverse of jira-fetch |
 | `tutor` | (`/tutor` only, manual) Patient expert teacher for the current work or a topic: defines every term first, then teaches step by step, grounded in real code/manuals, with comprehension checks. Korean, chat-only |
 | `blog` | Draft a Korean tech blog post for velog (minimal text, visuals-first): scaffolds `work-docs/blog/<date>-<slug>/`, renders diagrams to images via Kroki (velog can't render Mermaid) + matplotlib charts |
@@ -39,7 +39,7 @@ Skills are grouped by domain prefix:
 | `cmt-` | CUBRID Migration Toolkit (runs, schema/data parity) |
 | `jdbc-` | CUBRID JDBC driver |
 | `cubrid-` | General CUBRID (e.g. manual lookup) |
-| _(none)_ | Truly general-purpose skills |
+| _(none)_ | Skills whose name already says what they do, whether general-purpose (`commit`, `note`) or workflow-specific (`pr-review`, `ci-check`, `submodule-bump`) |
 
 ## Install
 
