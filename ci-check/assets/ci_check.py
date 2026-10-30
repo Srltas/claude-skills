@@ -12,18 +12,24 @@ A PR's tests report from one of two systems, and a green PR costs nothing on eit
 - gha-ci, a self-hosted GitHub Actions workflow (`gha-ci: test_*`) that `/run ...` PR comments
   start. Its nightly batch tests every develop commit (`dispatch all <sha>`) and posts the same
   statuses there, so each failing case is checked against develop itself: at the PR's base and
-  at the newest develop commit with a verdict. Only failed shards' logs are read.
+  at the newest develop commit with a verdict. That nightly runs each commit once, so a case that
+  fails now and then can pass there: a case develop does not explain is then looked up in other
+  PRs' recent failed runs. Only failed shards' logs are read.
 """
 import json, re, subprocess, sys
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 
 REPO_DEFAULT = "CUBRID/cubrid"
 SAMPLE = 5           # comparison builds (other PRs' runs of the same job)
 TIMEOUT = 30
-SAME_BUILD = 3       # gha-ci: other runs of the same PR head read for flakiness
+SAME_BUILD = 3       # gha-ci: other runs of one build read for flakiness, and other PRs' failing runs checked so
 DEVELOP_WALK = 15    # gha-ci: newest develop commits searched for a verdict
+OTHER_DAYS = 3       # gha-ci: how far back other PRs' failed runs are searched for the same case
+OTHER_RUNS = 40      # gha-ci: at most this many of those runs, newest first
+OTHER_SHARDS = 3     # gha-ci: one of those runs that failed more of the suite's shards is broken, not flaky
 ARTIFACTS = "http://192.168.1.48:30080"   # gha-ci's JUnit XML: internal, often unreachable
 
 # A case line in a gha-ci shard's CTP output, sql/medium and shell:
@@ -232,11 +238,13 @@ def run_jobs(repo, run):
         "--jq", '.jobs[] | [.id, .name, (.conclusion // "")] | @tsv')]
 
 
-def job_log(repo, job):
-    # `gh run view`, not the jobs/<id>/logs endpoint: it fetches the whole run's log as one
-    # compressed zip (~2 MB for 70 jobs) and caches it, where one sql shard alone is ~25 MB raw.
-    p = subprocess.run(["gh", "run", "view", "--job", str(job), "--log", "--repo", repo],
-                       capture_output=True, text=True, errors="replace")
+def job_log(repo, job, name=""):
+    # An sql shard's log is ~25 MB raw, so it comes out of the run's compressed log zip, which
+    # `gh run view` downloads once and caches. Any other job's (gate, plan, a shell or medium
+    # shard: ~100 KB) is fetched alone, since GitHub can take 30 s to build a run's zip.
+    cmd = (["gh", "run", "view", "--job", str(job), "--log", "--repo", repo] if name.startswith("shard sql ")
+           else ["gh", "api", f"repos/{repo}/actions/jobs/{job}/logs"])
+    p = subprocess.run(cmd, capture_output=True, text=True, errors="replace")
     return p.stdout if p.returncode == 0 else None
 
 
@@ -290,7 +298,7 @@ def suite_result(repo, run, suite):
             r["complete"] = False
             r["shards"].append((name, "cancelled"))
             continue
-        res, v, log = {}, None, job_log(repo, job)
+        res, v, log = {}, None, job_log(repo, job, name)
         for ln in (log or "").splitlines():
             m = CASE.search(ln)
             if m:
@@ -330,8 +338,8 @@ def tc_files(owner, tc_repo, commit, top):
 
 
 def read_runs(repo, suite, runs):
-    """Read several gha-ci runs at once. A run's first log costs its whole log zip, which GitHub
-    takes seconds to build, so runs go in parallel; one run's jobs go in sequence to share it."""
+    """Read several gha-ci runs at once. Each log takes seconds (an sql shard's costs the run's
+    whole log zip), so runs go in parallel; one run's jobs go in sequence to share that zip."""
     def one(run):
         suite_result(repo, run, suite), gate_info(repo, run), tc_commits(repo, run)
     with ThreadPoolExecutor(max_workers=8) as ex:
@@ -376,6 +384,51 @@ def fixing_commits(repo, base, fixed, cases):
     return hits, len(rows)
 
 
+def other_pr_failures(repo, pr, suite, cases):
+    """Which of `cases` other PRs' recent failed gha-ci runs failed too: {case: [(PR, run), ...]},
+    then how many runs were read, how many were left out as broken (over OTHER_SHARDS of the
+    suite's shards failed: that PR's own breakage, and dozens of logs), how many GitHub returned
+    no job list for (it sometimes answers "Server Error"), and the cut-off date. Newest first,
+    sixteen runs at a time, stopping once every case has one."""
+    since = (datetime.now(timezone.utc) - timedelta(days=OTHER_DAYS)).strftime("%Y-%m-%d")
+    runs = [(x, m.group(1)) for x, title in (ln.split("\t", 1) for ln in gh_lines(
+                f"repos/{repo}/actions/workflows/gha-ci.yml/runs?status=failure&created=%3E%3D{since}&per_page=100",
+                "--jq", ".workflow_runs[] | [.id, .display_title] | @tsv"))
+            for m in [re.match(r"PR #(\d+) ", title)] if m and m.group(1) != str(pr)][:OTHER_RUNS]
+
+    def failed_cases(run):
+        shards = [n for _, n, concl in run_jobs(repo, run) if n.startswith(f"shard {suite} ") and concl == "failure"]
+        return suite_result(repo, run, suite)["nok"] if len(shards) <= OTHER_SHARDS else None
+
+    hits, read, broken = {}, [], 0
+    for i in range(0, len(runs), 16):
+        batch = runs[i:i + 16]
+        with ThreadPoolExecutor(max_workers=16) as ex:
+            noks = list(ex.map(lambda r: failed_cases(r[0]), batch))
+        read += batch
+        broken += noks.count(None)
+        for (x, p), nok in zip(batch, noks):
+            for case in cases & (nok or {}).keys():
+                hits.setdefault(case, []).append((p, x))
+        if cases <= hits.keys():
+            break
+    return hits, len(read), broken, sum(1 for x, _ in read if not run_jobs(repo, x)), since
+
+
+def same_build_flip(repo, suite, run, case, tc):
+    """Another run of the build `run` tested, on the same testcases commit, that passed `case`, or
+    None. A case that failed and passed on one build and one testcase set is flaky: nothing else
+    changed between the two runs."""
+    sha, commit = gate_info(repo, run)[0], tc_commits(repo, run).get(tc)
+    if not sha or not commit:
+        return None
+    others = [x for x, st, _ in gha_verdicts(repo, sha).get(suite, [])
+              if x != run and st in ("success", "failure")][:SAME_BUILD]
+    read_runs(repo, suite, others)
+    return next((x for x in others if tc_commits(repo, x).get(tc) == commit
+                 and outcome(repo, x, suite, case, tc) == "pass"), None)
+
+
 @lru_cache(maxsize=None)
 def artifacts_reachable():
     return sh("curl", "-s", "-o", "/dev/null", "-m", "3", "-w", "%{http_code}", ARTIFACTS + "/")[:1] in ("2", "3")
@@ -407,10 +460,11 @@ def gha_build_failed(names):
     print("  run의 build 잡 로그를 확인할 것. (테스트를 못 돌렸으므로 flaky·공통 판별은 의미가 없다.)")
 
 
-def gha_triage(repo, head, base, branch, failing):
+def gha_triage(repo, pr, head, base, branch, failing):
     """Classify each failing case of each failing gha-ci suite against develop, whose nightly
-    batch leaves a verdict on (nearly) every commit, and against this PR's other runs of the
-    same build. `failing` holds (suite, run, state, description)."""
+    batch leaves a verdict on (nearly) every commit, against this PR's other runs of the same
+    build, and, for a case develop does not explain, against other PRs' recent runs. `failing`
+    holds (suite, run, state, description)."""
     newer = develop_newer(repo, branch, base)
     word = {"success": "passed", "failure": "failed"}
     for suite, run, state, desc in failing:
@@ -478,13 +532,38 @@ def gha_triage(repo, head, base, branch, failing):
             else:
                 unknown.append((case, n))
 
+        # The nightly runs each develop commit once, so a case that fails now and then can pass
+        # there and look like this PR's. Other PRs' recent runs catch it. A case newer develop
+        # passes is left alone: other PRs on old bases fail it too, and that is a stale base.
+        ask = set(unique) | {c for c, n in unknown if n != "pass"}
+        elsewhere = []
+        if ask:
+            hits, read, broken, unreadable, since = other_pr_failures(repo, pr, suite, ask)
+            print(f"    other PRs: {read} failed gha-ci run(s) since {since} read, newest first"
+                  + (f"; {broken} left out, over {OTHER_SHARDS} {suite} shards failed (broken, not flaky)" if broken else "")
+                  + (f"; {unreadable} skipped, GitHub returned no job list" if unreadable else ""))
+            for case in sorted(hits):
+                tc = r["repo"][case]
+                flip = next(((p, x, y) for p, x in hits[case][:SAME_BUILD]
+                             for y in [same_build_flip(repo, suite, x, case, tc)] if y), None)
+                elsewhere.append((case, hits[case], flip))
+            unique = [c for c in unique if c not in hits]
+            unknown = [c for c in unknown if c[0] not in hits]
+
         bs, ns = base[:7], (newest[0][:7] if newest else "")
 
         def note(b, n):
             return " · ".join(([f"base {bs} {KO[b]}"] if b else []) + ([f"develop {ns} {KO[n]}"] if n else []))
 
+        def where(c):
+            runs = ", ".join(f"PR #{p} run {x}" for p, x in c[1][:3]) + (f" 외 {len(c[1]) - 3}건" if len(c[1]) > 3 else "")
+            return (f"{c[0]}  ({runs}에서도 실패)"
+                    + (f"  ** 확정 flaky: PR #{c[2][0]}의 동일 빌드 run {c[2][2]}에서는 통과 **" if c[2] else ""))
+
         show("공통 (develop에서도 실패, 이 PR 무관)", common, lambda c: f"{c[0]}  ({note(c[1], c[2])})")
         show("flaky (실행마다 결과가 갈림)", flaky, lambda c: f"{c[0]}  (동일 빌드 run {c[1]}에서 통과)")
+        if elsewhere:
+            show("flaky 추정 (다른 PR에서도 실패, 이 PR 무관)", elsewhere, where)
         show("고유 (여기서만 실패)", unique, lambda c: c)
         if unknown:
             show("판정 불가 (develop과 비교할 근거 없음)", unknown,
@@ -519,6 +598,14 @@ def gha_triage(repo, head, base, branch, failing):
             print(f"    {len(unsure)}건은 PR의 base({bs})에서도 실패한다: 이 PR 탓이 아니다. base 이후 develop의 판정이 아직 없어 base 업데이트로 고쳐지는지는 모른다.")
         if flaky:
             print(f"    {len(flaky)}건은 동일 빌드에서 통과한 적이 있다: 확정 flaky. PR에 `/run rerun {run}` 코멘트로 다시 돌리면 된다.")
+        if elsewhere:
+            sure = sum(1 for c in elsewhere if c[2])
+            print(f"    {len(elsewhere)}건은 다른 PR의 최근 run에서도 실패했다: 이 PR 탓이 아닌 flaky로 보인다"
+                  + (f"(그중 {sure}건은 그 PR의 동일 빌드에서 통과도 해 확정 flaky)" if sure else "") + ".")
+            if not flaky:
+                print(f"    PR에 `/run rerun {run}` 코멘트로 다시 돌리면 된다.")
+            if sure < len(elsewhere):
+                print("    확정이 아닌 건은 다시 돌려도 또 실패하면 이 PR의 변경과 대조할 것.")
         if unknown:
             print(f"    {len(unknown)}건은 develop과 비교할 근거가 없다: 고유로 단정하지 말 것.")
             later = [c[0] for c in unknown if c[1] == "pass"]
@@ -564,7 +651,7 @@ def gha_run_mode(repo, run):
         return 0
     if builds:
         gha_build_failed(builds)
-    gha_triage(repo, sha, base, branch, failing)
+    gha_triage(repo, pr, sha, base, branch, failing)
     return 1
 
 
@@ -640,7 +727,7 @@ def main():
     if builds:
         gha_build_failed(builds)
     if gha:
-        gha_triage(repo, head, base, branch, gha)
+        gha_triage(repo, pr, head, base, branch, gha)
     return 1
 
 
