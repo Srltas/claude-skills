@@ -19,7 +19,8 @@ Prefer the `skill-create` skill, which scaffolds and self-reviews a new `SKILL.m
 1. Create `<prefix>-<name>/SKILL.md` with frontmatter (`name`, `description`) and numbered steps, and add its row to the README `Skills` table.
 2. `just install` to link it (needed once per new skill).
 3. `just check` must pass.
-4. Commit the new directory.
+4. If the skill could be mistaken for a neighbor, add a case under `evals/` and run `just eval --case <case>` (real model calls, about $0.10 per run). Re-run the affected cases after changing a description.
+5. Commit the new directory.
 
 ## Reference material (read-only)
 

@@ -60,3 +60,24 @@ check:
     mkdir -p "$tmp/.claude/skills"
     for f in */SKILL.md; do cp -R "${f%/SKILL.md}" "$tmp/.claude/skills/"; done
     claude plugin validate "$tmp/.claude/skills"
+
+# Run the trigger evals in evals/ on a temporary plugin built from these skills (claude plugin
+# eval needs a plugin). Every run is a real model call on your account, so filter while
+# iterating, e.g. `just eval --case 'docs-*' --runs 1`
+[positional-arguments]
+eval *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "$tmp"' EXIT
+    p="$tmp/srltas-skills"
+    mkdir -p "$p/.claude-plugin" "$p/skills" "$p/evals"
+    echo '{"name": "srltas-skills"}' > "$p/.claude-plugin/plugin.json"
+    for f in */SKILL.md; do cp -R "${f%/SKILL.md}" "$p/skills/"; done
+    for f in evals/*/prompt.md; do cp -R "${f%/prompt.md}" "$p/evals/"; done
+    # same model and effort as ~/.claude/settings.json; without the read tools Claude can pick a
+    # skill but not carry it out, so each run ends right after the pick
+    CLAUDE_CODE_EFFORT_LEVEL="${CLAUDE_CODE_EFFORT_LEVEL:-xhigh}" \
+      claude plugin eval "$p" --trust-plugin --no-publish --ablation none --model opus \
+      --disallow-tools Read Glob Grep Agent ToolSearch \
+      --output-dir "$PWD/evals/results/$(date +%Y%m%d-%H%M%S)" "$@"

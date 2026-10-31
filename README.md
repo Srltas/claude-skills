@@ -62,6 +62,17 @@ npx skills add Srltas/claude-skills -y -g
 
 Use one way per machine: `npx skills` manages copies, `just install` links to this repo.
 
+## Trigger evals
+
+`evals/` checks that Claude picks the right skill among neighbors that are easy to mix up (worklog, note, report; self-review, pr-review, review-triage; jira-fetch, jira-draft) and picks none for a nearby general question. Each case is a prompt a user might type, a `graders/fires-<skill>.md` for the skill that must be invoked, and a `graders/not-<skill>.md` for each skill that must not be. `just eval` runs the cases with [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) on a temporary plugin built from these skills:
+
+```bash
+just eval                              # every case, 3 runs each
+just eval --case 'review-*' --runs 1   # one group, one run each
+```
+
+Every run is a real model call on your account, about $0.10 each with Opus. Claude can pick a skill but not carry it out, so each run ends right after the pick. Reports go to `evals/results/`, which is not committed. After changing a description, re-run its cases.
+
 ## License
 
 MIT. See [`LICENSE`](LICENSE).

@@ -88,7 +88,7 @@ Before installing, sanity-check that it will actually fire and run:
 - **Trigger fit**: check the description against the 2-3 SHOULD-fire prompts and the one must-NOT-fire prompt from Step 4. Adjust the description if it under- or over-triggers.
 - **Dry run**: walk the steps against one realistic prompt. Every command must be runnable exactly as written; run the read-only steps to confirm the paths and tools exist. Fix any step that is vague or broken.
 
-For a high-stakes skill, measure triggering with `claude plugin eval` (should-fire and must-not-fire prompts, each run with and without the skill; see `claude plugin eval --help`) rather than skill-creator's description optimizer, which tests a slash command instead of the skill: this step is the lightweight local equivalent.
+When the skill could be mistaken for a neighbor, measure it: copy a case under `<collection-root>/evals/`, put a should-fire prompt in `prompt.md`, keep `graders/fires-<name>.md` and one `graders/not-<neighbor>.md` per neighbor, then run `just eval --case <case>` (about $0.10 per run; see the README's Trigger evals). Use this rather than skill-creator's description optimizer, which tests a slash command instead of the skill.
 
 ## Step 8: Self-review (required)
 
@@ -109,7 +109,7 @@ just install && just list | grep <frontmatter-name>
 `just list` prints frontmatter `name:` values, so grep the name set in the SKILL.md. Add the skill's row to the README `Skills` table (a manual-only row starts with ``(`/<name>` only, manual)``), then run `just check` and fix every `FAIL`. Once it passes, propose committing (match the style of `git log --oneline -10`):
 
 ```bash
-git add <skill-name>/ && git commit -m "feat: add <skill-name> skill"
+git add <skill-name>/ README.md evals/ && git commit -m "feat: add <skill-name> skill"
 ```
 
 Skills are **linked** from the repo, so later edits are live; `just install` is needed only once per new skill.
