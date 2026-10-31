@@ -43,21 +43,24 @@ Skills are grouped by domain prefix:
 
 ## Install
 
-Using the [`skills`](https://github.com/vercel-labs/skills) CLI (installs globally to `~/.claude/skills/`):
+Where you edit the skills, clone the repo and link each skill into `~/.claude/skills/`, so edits here are live without reinstalling:
+
+```bash
+git clone https://github.com/Srltas/claude-skills.git
+cd claude-skills
+just install      # link every skill (an old copy that matches the repo goes to the Trash)
+just list         # list the skills and whether each one is linked
+just check        # check every skill against the conventions
+just remove NAME  # unlink one skill
+```
+
+Anywhere else, install copies with the [`skills`](https://github.com/vercel-labs/skills) CLI:
 
 ```bash
 npx skills add Srltas/claude-skills -y -g
 ```
 
-Or clone and use the justfile:
-
-```bash
-git clone https://github.com/Srltas/claude-skills.git
-cd claude-skills
-just install      # install all skills globally
-just list         # list installed skills
-just remove NAME  # remove one skill
-```
+Use one way per machine: `npx skills` manages copies, `just install` links to this repo.
 
 ## License
 

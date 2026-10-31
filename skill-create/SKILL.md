@@ -10,7 +10,13 @@ Scaffold a new skill and write a complete, trigger-tested `SKILL.md` (plus `scri
 
 ## Step 1: Find the collection root
 
-Walk up from the current directory looking for a `justfile` that contains `npx skills add`. That directory is the collection root. If none is found, ask the user for the collection path.
+The collection root is where this skill's directory really lives, since `just install` links the skills from the repo:
+
+```bash
+(cd -P "${CLAUDE_SKILL_DIR}/.." && pwd)
+```
+
+If that directory has no `tools/check_skills.py` (for example, a machine with copied skills), ask the user for the collection path.
 
 ## Step 2: Derive the skill name
 
@@ -106,4 +112,4 @@ just install && just list | grep <frontmatter-name>
 git add <skill-name>/ && git commit -m "feat: add <skill-name> skill"
 ```
 
-Skills are **copy-installed**, so re-run `just install` after any later edit to the skill.
+Skills are **linked** from the repo, so later edits are live; `just install` is needed only once per new skill.
