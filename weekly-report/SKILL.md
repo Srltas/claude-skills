@@ -16,7 +16,7 @@ Compress each issue into **one line** for the weekly-report spreadsheet: one lin
 
 ## Step 0: Prereq
 
-The **jira-fetch** skill installed at `~/.claude/skills/jira-fetch/` (this skill calls its helper). Its constraints apply: only publicly readable projects (CBRD, TOOLS, APIS, ...) can be read; internal-only projects such as CUBRIDQA fail with `HTTP 401`.
+The **jira-fetch** skill, installed next to this one (this skill calls its helper). Its constraints apply: only publicly readable projects (CBRD, TOOLS, APIS, ...) can be read; internal-only projects such as CUBRIDQA fail with `HTTP 401`.
 
 ## Step 1: Parse the keys
 
@@ -25,7 +25,7 @@ From `$ARGUMENTS`, take every `PROJECT-NUMBER`. Accept commas or spaces, a paste
 ## Step 2: Fetch all of them in one call
 
 ```bash
-bash ~/.claude/skills/jira-fetch/assets/fetch_jira.sh APIS-1111 TOOLS-4324 ...
+bash ${CLAUDE_SKILL_DIR}/../jira-fetch/assets/fetch_jira.sh APIS-1111 TOOLS-4324 ...
 ```
 
 The helper takes many keys at once, so call it **once** for the whole list. It writes `./jira/<KEY>.md` (title as `# heading`, then the description). Skip any key whose `.md` already exists: do not re-fetch. A key that cannot be read is simply reported as missing, and the rest still succeed.

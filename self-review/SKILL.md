@@ -33,7 +33,7 @@ This skill exists to counteract one specific failure: the author keeps going in 
 Run the collector first. It covers committed, staged, unstaged, and untracked work in one call, because mid-work the change is not only in commits:
 
 ```bash
-bash <skill-base-dir>/assets/review_context.sh [base-ref] [--residual '<regex>']
+bash ${CLAUDE_SKILL_DIR}/assets/review_context.sh [base-ref] [--residual '<regex>']
 ```
 
 It prints where you are, the four layers of the work, untouched siblings, patterns the change removes that still survive, and a local convention sample. It gathers and does not judge: every count is a lead that still needs a contract quoted against it.

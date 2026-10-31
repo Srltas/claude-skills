@@ -22,10 +22,10 @@ Never hardcode or echo the credentials; the helper reads them from the environme
 ## Step 1: Fetch the issue(s)
 
 ```bash
-bash <skill-base-dir>/assets/fetch_jira.sh -o ./jira CBRD-1234 [TOOLS-4888 APIS-1079 …]
+bash ${CLAUDE_SKILL_DIR}/assets/fetch_jira.sh -o ./jira CBRD-1234 [TOOLS-4888 APIS-1079 …]
 ```
 
-`<skill-base-dir>` is this skill's own directory. The helper clones/syncs the tool if needed, resolves credentials (env → the tool's `.envrc`), downloads each issue to `<out-dir>/<KEY>.md`, and prints the file paths. If credentials or `pandoc` are missing it stops with instructions rather than guessing.
+The helper clones/syncs the tool if needed, resolves credentials (env → the tool's `.envrc`), downloads each issue to `<out-dir>/<KEY>.md`, and prints the file paths. If credentials or `pandoc` are missing it stops with instructions rather than guessing.
 
 **Issue URLs work too**: a pasted `http://jira.cubrid.org/browse/CBRD-1234` (or `.../issues/...`, with or without a query string) is reduced to its key, and lower-case keys are upper-cased. Anything with no readable key is rejected with a clear error.
 

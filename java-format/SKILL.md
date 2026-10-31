@@ -15,7 +15,7 @@ Ask the user which google-java-format version to use (commonly `1.7` or `1.32.0`
 ## Step 2: Run
 
 ```bash
-bash <skill-base-dir>/assets/format.sh --version <ver> <changed|staged|all|FILE...>
+bash ${CLAUDE_SKILL_DIR}/assets/format.sh --version <ver> <changed|staged|all|FILE...>
 ```
 
 - `changed`: working-tree changes (`git diff --diff-filter=ACM -- '*.java'`)

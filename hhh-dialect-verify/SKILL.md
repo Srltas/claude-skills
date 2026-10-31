@@ -38,7 +38,7 @@ The Gradle task **exits non-zero when tests fail: that is expected**; continue t
 ## Step 5: Parse results → failure set
 
 ```bash
-python3 <skill-base-dir>/assets/parse_results.py parse \
+python3 ${CLAUDE_SKILL_DIR}/assets/parse_results.py parse \
   ~/Devel/hibernate/hibernate-core/target/test-results/test  <run>.json
 ```
 
@@ -47,7 +47,7 @@ Prints `total / passed / failed / skipped` and a per-family failure breakdown, a
 ## Step 6: Diff vs baseline → recovered / regressed
 
 ```bash
-python3 <skill-base-dir>/assets/parse_results.py diff  baseline.json  <run>.json
+python3 ${CLAUDE_SKILL_DIR}/assets/parse_results.py diff  baseline.json  <run>.json
 ```
 
 Prints `net` (baseline − after), **+N recovered** (failed in baseline, not now), **−N regressed** (new failures), each broken down by family, and lists the regressed tests.

@@ -17,7 +17,7 @@ Write a tight, visuals-first Korean tech blog post for **velog**, saved as a dra
 ## Step 1: Scaffold the post folder
 
 ```bash
-bash <skill-base-dir>/assets/new_blog.sh <slug>
+bash ${CLAUDE_SKILL_DIR}/assets/new_blog.sh <slug>
 ```
 
 Creates `blog/<YYYY-MM-DD>-<slug>/index.md` + an `assets/` folder, and prints the draft's GitHub URL.
@@ -41,7 +41,7 @@ Put each source in `assets/`, render it to an image, and embed with `![설명](a
 
 - **Diagram-as-code** (Mermaid / Graphviz / D2 / PlantUML): write `assets/diagram-N.mmd`, then render to PNG for velog:
   ```bash
-  bash <skill-base-dir>/assets/render.sh assets/diagram-N.mmd assets/diagram-N.png
+  bash ${CLAUDE_SKILL_DIR}/assets/render.sh assets/diagram-N.mmd assets/diagram-N.png
   ```
   Keep the `.mmd` source so the diagram stays editable and reproducible. (velog accepts PNG uploads; SVG upload is often blocked, so render PNG for velog.)
 - **Data charts**: build a chart JSON and render it with the report skill's `figures.py` to `assets/chart-N.png` (see the report skill for the `figures.py <block.json> <out.png>` command).

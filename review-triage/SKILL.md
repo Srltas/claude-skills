@@ -24,7 +24,7 @@ Those state **what this PR set out to do**, which Step 3 judges scope against. I
 ## Step 2: Fetch the reviews
 
 ```bash
-bash <skill-base-dir>/assets/fetch_reviews.sh [PR] [--include-resolved]
+bash ${CLAUDE_SKILL_DIR}/assets/fetch_reviews.sh [PR] [--include-resolved]
 ```
 
 Merges inline code comments, review summaries, and PR-level comments (humans and bots, shown as `(User)` / `(Bot)`) with thread/reply info. Needs `gh` (authenticated) and `jq`.

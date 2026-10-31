@@ -22,7 +22,7 @@ BASELINE=""
 TESTS=""
 SKIP_RUN=0
 CLEANUP=1
-PARSE="${PARSE_RESULTS:-$HOME/.claude/skills/hhh-dialect-verify/assets/parse_results.py}"
+PARSE="${PARSE_RESULTS:-$(cd "$(dirname "$0")" && pwd)/../../hhh-dialect-verify/assets/parse_results.py}"
 
 while [ $# -gt 0 ]; do
   case "$1" in

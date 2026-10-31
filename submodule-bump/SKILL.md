@@ -14,8 +14,8 @@ Dispatch `submodule-bump-receiver.yml` on `CUBRID/cubrid` so the parent repo pin
 ## Step 0: Check the state first (read-only)
 
 ```bash
-bash <skill-base-dir>/assets/bump_submodule.sh --status             # all three, at a glance
-bash <skill-base-dir>/assets/bump_submodule.sh <submodule> --status # that one's pending commits
+bash ${CLAUDE_SKILL_DIR}/assets/bump_submodule.sh --status             # all three, at a glance
+bash ${CLAUDE_SKILL_DIR}/assets/bump_submodule.sh <submodule> --status # that one's pending commits
 ```
 
 Read-only, so run it without asking first. One call reports, for all three submodules, the pinned SHA, the submodule head, how many commits are pending, and the open bump PR.
@@ -39,7 +39,7 @@ The SHA can be a full 40-char SHA, a short SHA (it is expanded), or `latest` for
 ## Step 2: Validate (dry run, dispatches nothing)
 
 ```bash
-bash <skill-base-dir>/assets/bump_submodule.sh <submodule> <sha|latest>
+bash ${CLAUDE_SKILL_DIR}/assets/bump_submodule.sh <submodule> <sha|latest>
 ```
 
 It prints the currently pinned SHA, the target, the direction of the move, and a compare link, then shows the exact `gh` command **without running it**. It refuses, and dispatches nothing, when:
@@ -62,7 +62,7 @@ Show the user the summary from Step 2 (pinned -> target, how many commits, the c
 ## Step 4: Dispatch
 
 ```bash
-bash <skill-base-dir>/assets/bump_submodule.sh <submodule> <sha|latest> --run
+bash ${CLAUDE_SKILL_DIR}/assets/bump_submodule.sh <submodule> <sha|latest> --run
 ```
 
 Then report the run:

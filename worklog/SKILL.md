@@ -22,7 +22,7 @@ From `$ARGUMENTS`: an issue key (`<PROJECT>-<N>`, e.g. `CBRD-1234`, `TOOLS-4888`
 For a CUBRID Jira Server issue (CBRD, TOOLS, APIS, CUBRIDQA), pull its summary/description with jira-fetch to seed the note:
 
 ```bash
-bash ~/.claude/skills/jira-fetch/assets/fetch_jira.sh -o /tmp/jira <KEY>
+bash ${CLAUDE_SKILL_DIR}/../jira-fetch/assets/fetch_jira.sh -o /tmp/jira <KEY>
 ```
 
 (HHH is Atlassian Cloud, which jira-fetch does not support, so write its context from the session instead.) Also use the current session's work (the change, the verification numbers) as the substance.
@@ -30,7 +30,7 @@ bash ~/.claude/skills/jira-fetch/assets/fetch_jira.sh -o /tmp/jira <KEY>
 ## Step 3: Scaffold the file
 
 ```bash
-bash <skill-base-dir>/assets/new_worklog.sh <ISSUE-KEY|topic> [slug]
+bash ${CLAUDE_SKILL_DIR}/assets/new_worklog.sh <ISSUE-KEY|topic> [slug]
 ```
 
 Creates `<KEY>/<KEY>-<slug>.md` from the template (refuses to overwrite an existing one) and prints the local path plus the public GitHub URL it will have.

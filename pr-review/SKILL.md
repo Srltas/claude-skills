@@ -21,7 +21,7 @@ Reviewing someone else's code fails in the opposite direction from reviewing you
 ## Step 1: Put the PR on this machine
 
 ```bash
-~/.claude/skills/pr-review/assets/fetch_pr.sh https://github.com/OWNER/REPO/pull/1629 CBRD-12345
+${CLAUDE_SKILL_DIR}/assets/fetch_pr.sh https://github.com/OWNER/REPO/pull/1629 CBRD-12345
 ```
 
 It resolves the repository against **every** remote (`origin` is often the reviewer's own fork), fetches `refs/pull/N/head` into `refs/pr/N` and the base branch into `refs/pr-base/N`, expands a **detached worktree** under scratch, and prints repo, PR, title, author, base/head/merge-base, the worktree path, and every changed file with its +/- counts. If the repo is not on this machine it bare-clones into a scratch cache: the worktree holds the only checkout, so nothing is duplicated, and the next review of that repo is fast. The base is kept as a ref, not a branch, which is why cleanup removes two refs.
@@ -87,7 +87,7 @@ Dispatch these in one batch with the Agent tool, and only once the size gate in 
 
 Follow `references/output.md`: the survival test against review-triage, the mandatory per-pass coverage line (or the 합의 범위 line from the size gate), four hard-separated sections (결함 / 판단 사항 / 범위 밖·후속 제안 / 질문), severity ranking within 결함 only, the nine-part finding anatomy including 이력 and 반증 시도, and the Korean templates. Patches are labelled `힌트(미검증):` unless actually compiled. Korean, colleague's voice, no em-dash.
 
-Then clean up: `~/.claude/skills/pr-review/assets/fetch_pr.sh OWNER/REPO N --cleanup` removes the worktree and the two refs, and nothing else. Keep the worktree only if the user wants to keep digging, and say that you did.
+Then clean up: `${CLAUDE_SKILL_DIR}/assets/fetch_pr.sh OWNER/REPO N --cleanup` removes the worktree and the two refs, and nothing else. Keep the worktree only if the user wants to keep digging, and say that you did.
 
 ## Hard rules
 

@@ -28,7 +28,7 @@ Then pick a short **slug**. **Before scaffolding, state the resolved `<category>
 ## Step 2: Scaffold the file
 
 ```bash
-bash <skill-base-dir>/assets/new_note.sh <category> <slug>
+bash ${CLAUDE_SKILL_DIR}/assets/new_note.sh <category> <slug>
 ```
 
 Creates `<category>/<YYYY-MM-DD>-<slug>.md` from the template (refuses to overwrite) and prints the local path plus the public GitHub URL. Category and slug are lowercased and sanitized.

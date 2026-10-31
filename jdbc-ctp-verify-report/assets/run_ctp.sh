@@ -22,7 +22,7 @@ OUT="./ctp-out"
 BASELINE=""
 NO_BUILD=0
 CLEANUP=1
-PARSE="${PARSE_CTP:-$HOME/.claude/skills/jdbc-ctp-verify-report/assets/parse_ctp.py}"
+PARSE="${PARSE_CTP:-$(cd "$(dirname "$0")" && pwd)/parse_ctp.py}"
 
 while [ $# -gt 0 ]; do
   case "$1" in

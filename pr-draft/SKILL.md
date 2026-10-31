@@ -11,7 +11,7 @@ Turn the current branch into a ready-to-paste PR title and body, grounded in the
 ## Step 1: Context and changes (one call)
 
 ```bash
-bash <skill-base-dir>/assets/pr_context.sh [base-ref]
+bash ${CLAUDE_SKILL_DIR}/assets/pr_context.sh [base-ref]
 ```
 
 Prints the branch, the issue key taken from the branch name, the resolved base, the commit list, the changed-file stat, and how many non-test files changed. Pass a base only when the user names one (`--tc` is a body-template flag, not a base).

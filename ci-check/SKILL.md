@@ -40,8 +40,8 @@ Re-running anything needs a token (CircleCI) or a PR comment (gha-ci), which is 
 ## Step 1: Run it
 
 ```bash
-python3 <skill-base-dir>/assets/ci_check.py [PR]
-python3 <skill-base-dir>/assets/ci_check.py https://github.com/CUBRID/cubrid/actions/runs/<run-id>
+python3 ${CLAUDE_SKILL_DIR}/assets/ci_check.py [PR]
+python3 ${CLAUDE_SKILL_DIR}/assets/ci_check.py https://github.com/CUBRID/cubrid/actions/runs/<run-id>
 ```
 
 `PR` is a number or URL; with no argument it uses the current branch's PR. Pass a **gha-ci run URL** instead when the user names a run, or when a later push or base update left the failing run off the PR head: the PR's checks show only the current head's statuses. Needs `gh` (authenticated), `curl`, and `python3`.

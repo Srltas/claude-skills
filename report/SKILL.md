@@ -96,19 +96,19 @@ Author the SVG yourself, the way the `visualize` tool would: deliberate layout, 
 ## Step 3: Generate the .docx
 
 ```bash
-bash <skill-base-dir>/assets/build.sh <topic>.json <output>.docx
+bash ${CLAUDE_SKILL_DIR}/assets/build.sh <topic>.json <output>.docx
 ```
 
 `build.sh` checks the toolchain and then runs `build_report.js`, so building is one call.
 
-`<skill-base-dir>` is this skill's own directory (shown as its base directory when the skill runs). `build_report.js` calls `figures.py` for `chart`/`diagram` blocks (matplotlib), renders each `mermaid` block to PNG via Kroki (`curl`; override the endpoint with `KROKI_URL`), and rasterizes each `svg` block's PNG fallback via LibreOffice (`soffice`, resolved on PATH → macOS app bundle). Filename convention: `CUBRID_<주제>_<유형>_YYYYMMDD.docx`.
+`build_report.js` calls `figures.py` for `chart`/`diagram` blocks (matplotlib), renders each `mermaid` block to PNG via Kroki (`curl`; override the endpoint with `KROKI_URL`), and rasterizes each `svg` block's PNG fallback via LibreOffice (`soffice`, resolved on PATH → macOS app bundle). Filename convention: `CUBRID_<주제>_<유형>_YYYYMMDD.docx`.
 
 ## Step 4: Validate, visually verify, hand off
 
 **1) Check and render in one call**:
 
 ```bash
-bash <skill-base-dir>/assets/preview.sh <output>.docx
+bash ${CLAUDE_SKILL_DIR}/assets/preview.sh <output>.docx
 ```
 
 It verifies the .docx structure (zip integrity, required parts, well-formed XML in every part) and then renders every page to PNG, printing the image paths. Read those images. This is a structural check, not full OOXML schema validation.

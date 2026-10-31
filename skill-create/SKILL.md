@@ -48,7 +48,7 @@ If the name was deferred in Step 2, derive it now from the workflow's verb + obj
 Keep in `SKILL.md` only what the model needs every time it runs; push the rest into bundled files it loads on demand. Create only the directories the skill actually needs (a pure-guidance skill is `SKILL.md` alone):
 
 - **SKILL.md**: metadata + the workflow steps. Keep it under ~500 lines. If a section grows past ~300 lines, move it to `references/` and link it.
-- **scripts/**: deterministic code the skill runs (parsers, builders, runners) instead of re-deriving logic in prose. Invoke via `<skill-base-dir>/scripts/…`.
+- **scripts/**: deterministic code the skill runs (parsers, builders, runners) instead of re-deriving logic in prose. Invoke them through the skill-directory variable (Step 6).
 - **references/**: long docs, tables, or per-variant guides the skill reads only when relevant (organize by variant, e.g. `references/oracle.md`; add a table of contents to any file over ~300 lines).
 - **assets/**: templates, example specs, fonts, or icons the skill copies or embeds.
 
@@ -61,7 +61,7 @@ Frontmatter: `name` (kebab-case, matching the directory) and `description`.
 - Put ALL the "when to use" in the description, not in the body.
 - Be specific and a little assertive so it fires when it should, but keep the triggers tied to THIS workflow so it does not fire on unrelated tasks.
 
-**Body:** a `# Title` heading and numbered, executable steps with exact commands. Reference bundled files with `<skill-base-dir>/…`. No placeholders, no leftover `<!-- … -->` comments. Match the collection's house style.
+**Body:** a `# Title` heading and numbered, executable steps with exact commands. Reference bundled files through Claude Code's skill-directory variable: a dollar sign followed by `{CLAUDE_SKILL_DIR}` and the path, exactly as `pr-draft/SKILL.md` writes it (this file cannot spell it in one piece, because Claude Code would expand it to skill-create's own path). Reach a sibling skill's file with `/../<sibling>/…` after it. It expands only in SKILL.md and in `allowed-tools`, so inside `references/` write the installed path, `~/.claude/skills/<skill>/…`, instead. No placeholders, no leftover `<!-- … -->` comments. Match the collection's house style.
 
 **Write the instructions in English.** SKILL.md is read by the model on every invocation, and Korean costs roughly twice the tokens for the same content. Keep Korean only where it is carrying meaning that English would lose:
 
@@ -82,7 +82,7 @@ For a high-stakes or to-be-distributed skill, use Anthropic's official `skill-cr
 
 - [ ] `description` is imperative, names *when* to use it, and ends with concrete `Triggers on phrases like '…'`; triggers are specific, not generic verbs.
 - [ ] `SKILL.md` holds the essentials only; long content is split into `references/` (with a TOC), deterministic logic lives in `scripts/`, templates in `assets/`.
-- [ ] Every step is executable with an exact command; bundled files are referenced via `<skill-base-dir>/…`.
+- [ ] Every step is executable with an exact command; bundled files go through the skill-directory variable (as in `pr-draft/SKILL.md`), never a hardcoded install path.
 - [ ] No placeholders and no leftover `<!-- … -->` comments; correct domain prefix.
 - [ ] Passed the Step 7 trigger + dry-run test.
 

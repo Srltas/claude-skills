@@ -13,14 +13,14 @@ Run the hibernate-core suite against CUBRID (one version or the full matrix), di
 
 ## Step 0: Prereqs
 
-- Installed skills: **`hhh-dialect-verify`** and **`report`** (both under `~/.claude/skills/`).
+- Installed skills: **`hhh-dialect-verify`** and **`report`** (both installed next to this skill).
 - Hibernate repo (default `~/Devel/hibernate`), Docker, `python3`, and for the report: `node` + global `docx`, plus the report venv (matplotlib). See the report skill's Step 0.
 - Optional: the **Understand-Anything** plugin (`/understand-*` commands). If installed, Step 3 can add a change-impact (영향 범위) note; the pipeline runs fine without it.
 
 ## Step 1: Run the orchestrator (verify across versions)
 
 ```bash
-bash <skill-base-dir>/assets/run_verify.sh \
+bash ${CLAUDE_SKILL_DIR}/assets/run_verify.sh \
   --baseline ~/Devel/cubrid-fullsuite-10.2-2026-06-13.tgz \
   --all-versions                      # or: --versions 10.2,11.4   (add --tests '<filter>' for a fast run)
 ```
@@ -50,8 +50,8 @@ Follow the report skill's schema + 작성 원칙 (간결, 표/차트 우선). De
 ## Step 4: Generate, validate, visually verify (MANDATORY)
 
 ```bash
-bash ~/.claude/skills/report/assets/build.sh   <spec>.json <out>.docx
-bash ~/.claude/skills/report/assets/preview.sh <out>.docx
+bash ${CLAUDE_SKILL_DIR}/../report/assets/build.sh   <spec>.json <out>.docx
+bash ${CLAUDE_SKILL_DIR}/../report/assets/preview.sh <out>.docx
 ```
 
 `build.sh` handles the toolchain; `preview.sh` checks the file's structure and renders every page to PNG. **Read those page images** before handing off (report skill Step 4). Hand the user the `.docx` path and `verify-out/summary.json`.
