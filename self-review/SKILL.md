@@ -2,6 +2,8 @@
 name: self-review
 description: "Review your own in-progress change before it becomes a PR, the way a hostile stranger would: check it against the issue and commit messages, hunt the cases you missed (uncommitted and untracked files included), and report ranked Korean findings with file:line evidence. Changes nothing. For someone else's PR use pr-review; for comments on your PR use review-triage. Triggers on phrases like '푸시 전에 검토해줘', '빠뜨린 케이스 없는지 봐줘', '셀프 리뷰'."
 argument-hint: "[base ref] [issue key]"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/review_context.sh *)"
 ---
 
 # Self-review your own work, before the PR

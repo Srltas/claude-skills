@@ -2,6 +2,8 @@
 name: note
 description: "Record an exploration note (PoC, review, code analysis, or other work without a Jira issue) as Markdown in the public work-docs repo, filled from the session and committed. For issue work, use worklog; for a Word report, use report. Triggers on phrases like '노트로 남겨줘', '분석 내용 기록해두자', 'PoC 노트 작성'."
 argument-hint: "<category> <slug>"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/new_note.sh *)"
 ---
 
 # Record an exploration note (work-docs)

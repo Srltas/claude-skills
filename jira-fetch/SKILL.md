@@ -2,6 +2,8 @@
 name: jira-fetch
 description: "Fetch CUBRID Jira issues as Markdown and load them as working context. Use it whenever a key like CBRD-1234 or a jira.cubrid.org link comes up and the issue content matters. Public projects only (CBRD, TOOLS, APIS); CUBRIDQA and Atlassian Cloud (HHH) cannot be fetched. To write a new issue, use jira-draft. Triggers on phrases like 'CBRD-1234 내용 가져와', '이 이슈 참고해서 작업하자'."
 argument-hint: "<ISSUE-KEY> [ISSUE-KEY...] [-o out-dir]"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/fetch_jira.sh *)"
 ---
 
 # Fetch a JIRA issue to local Markdown

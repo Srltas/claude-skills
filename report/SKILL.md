@@ -2,6 +2,9 @@
 name: report
 description: "Write a Korean analysis report as a Word (.docx) file in the CUBRID house style, with charts, diagrams, and color-coded result tables. Use for analysis, comparison, verification, or status reports on Hibernate, JDBC, or CUBRID work, for the team or the team lead. For Markdown notes, use note or worklog. Triggers on phrases like '보고서 만들어', 'Word 문서로 정리', '보고용 문서 작성'."
 argument-hint: "[report type] <topic / what to report on>"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/build.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/preview.sh *)"
 ---
 
 # Analysis report → Word (.docx)

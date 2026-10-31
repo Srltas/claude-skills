@@ -3,6 +3,8 @@ name: hhh-dialect-verify
 description: "Run the Hibernate ORM test suite against CUBRID and measure a dialect change against a baseline: total failures, how many recovered or regressed, and failures grouped by cause. For the run plus a Word report in one go, use /hhh-dialect-verify-report."
 argument-hint: "[CUBRID version: 10.2|11.4] [--tests <filter>]"
 disable-model-invocation: true
+allowed-tools:
+  - "Bash(python3 ${CLAUDE_SKILL_DIR}/assets/parse_results.py *)"
 ---
 
 # Hibernate ORM × CUBRID dialect verification

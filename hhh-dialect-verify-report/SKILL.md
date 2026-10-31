@@ -3,6 +3,10 @@ name: hhh-dialect-verify-report
 description: "Run the Hibernate ORM test suite against one or all CUBRID versions, compare pass/fail with a baseline, and always write a Korean Word comparison report. Combines hhh-dialect-verify and report in one run."
 argument-hint: "--baseline <json|tgz|dir> [--all-versions | --versions 10.2,11.4] [--tests <filter>]"
 disable-model-invocation: true
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/run_verify.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/../report/assets/build.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/../report/assets/preview.sh *)"
 ---
 
 # CUBRID dialect verify → report (one-shot)

@@ -2,6 +2,8 @@
 name: java-format
 description: "Format Java files in place with google-java-format (AOSP style): the changed, staged, or all files, or given paths. Asks which formatter version to use. Use before committing Java changes. Triggers on phrases like '포맷 확인해줘', 'google-java-format 적용', '자바 포맷 맞춰줘'."
 argument-hint: "<changed|staged|all|FILE...> [--version 1.7 or 1.32.0]"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/format.sh *)"
 ---
 
 # Apply google-java-format

@@ -3,6 +3,10 @@ name: jdbc-ctp-verify-report
 description: "Build the CUBRID JDBC driver, run the CTP JDBC suite, compare pass/fail with a baseline, classify the broken cases, and always write a Korean Word comparison report. The JDBC counterpart of hhh-dialect-verify-report."
 argument-hint: "--baseline <json|result-dir|test-jdbc.xml> [--no-build] [--cubrid <path>]"
 disable-model-invocation: true
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/run_ctp.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/../report/assets/build.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/../report/assets/preview.sh *)"
 ---
 
 # CUBRID JDBC driver verify (CTP) → report (one-shot)

@@ -2,6 +2,9 @@
 name: worklog
 description: "Record issue work (a CUBRID Jira or Hibernate HHH key) as a Markdown note in the public work-docs repo, filled from the session (background, cause, change, verification, result) and committed. For work without an issue, use note. Triggers on phrases like '작업 기록 남겨줘', 'worklog 작성', '이 이슈 문서로 정리해서 커밋'."
 argument-hint: "<ISSUE-KEY|topic> [slug]"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/../jira-fetch/assets/fetch_jira.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/new_worklog.sh *)"
 ---
 
 # Record work as a Markdown note (work-docs)

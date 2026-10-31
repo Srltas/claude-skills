@@ -2,6 +2,8 @@
 name: pr-draft
 description: "Draft a pull request title and body from the current branch's commits and diff: a [KEY] title with a short English summary and a Korean body (Purpose, Implementation, Remarks), ready to paste. Draft only, never creates the PR. With --tc, only when asked, it uses a compact template for CMT unit-test PRs. Triggers on phrases like 'PR 초안 작성해줘', 'TC PR 초안', '이 브랜치 PR로 정리'."
 argument-hint: "[base-branch] [--tc for CMT unit-test PR]"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/pr_context.sh *)"
 ---
 
 # Draft a pull request

@@ -3,6 +3,9 @@ name: blog
 description: "Draft a Korean tech blog post for velog in the public work-docs repo: short text, with every diagram and chart rendered as an image because velog does not render Mermaid. You publish it on velog yourself."
 argument-hint: "<slug> [topic]"
 disable-model-invocation: true
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/new_blog.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/render.sh *)"
 ---
 
 # Draft a tech blog post (velog, work-docs)

@@ -2,6 +2,9 @@
 name: pr-review
 description: "Review someone else's pull request in depth from its URL or number: reads every changed file in a separate worktree, learns why the code is the way it is before calling a defect, and returns a ranked Korean report of defects, judgment calls, and questions. Posts nothing. For your own work use self-review; for comments on your PR use review-triage. Triggers on phrases like '이 PR 리뷰해줘', '남의 PR 검토해줘'."
 argument-hint: "[PR URL or number] [optional JIRA key]"
+allowed-tools:
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/fetch_pr.sh *)"
+  - "Bash(${CLAUDE_SKILL_DIR}/assets/fetch_pr.sh *)"
 ---
 
 # Review someone else's pull request
