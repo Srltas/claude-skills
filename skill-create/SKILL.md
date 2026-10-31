@@ -54,12 +54,18 @@ Keep in `SKILL.md` only what the model needs every time it runs; push the rest i
 
 ## Step 6: Write the SKILL.md (and any scripts / references / assets)
 
-Frontmatter: `name` (kebab-case, matching the directory) and `description`.
+Frontmatter: `name` (kebab-case, matching the directory) and `description`, one double-quoted line.
 
-**`description`: invest here; it is the ONLY signal that makes the skill fire:**
-- One imperative line on what it does and what it produces, then the concrete "use when …" situations, ending with `Triggers on phrases like 'X', 'Y', 'Z'.`
-- Put ALL the "when to use" in the description, not in the body.
-- Be specific and a little assertive so it fires when it should, but keep the triggers tied to THIS workflow so it does not fire on unrelated tasks.
+**`description`: invest here; it is the ONLY signal that makes the skill fire.** Every auto-invoked skill's description rides along on every turn inside a shared budget (about 1% of the context window), and when the list overflows the least-used skills lose their descriptions first, so keep it tight:
+- Key use first: one imperative line on what it does and what it produces, then the situation that calls for it. Put ALL the "when to use" here, not in the body.
+- One boundary line when a neighbor skill could be mistaken for it: `For X, use Y.`
+- End with `Triggers on phrases like 'X', 'Y'.`: two or three phrases the user actually types, Korean included, tied to THIS workflow so it does not fire on unrelated tasks.
+- Leave implementation detail (tools, flags, file layouts) to the body.
+- About 250 to 450 characters (`just check` fails above 450). No `<` or `>` (the listing shows them as `&lt;` `&gt;`) and no em-dash.
+
+**Manual-only skills**: a workflow with external side effects (dispatching an Action, posting) or one the user always types gets `disable-model-invocation: true`, so only `/<name>` runs it. Its description then never reaches Claude: drop the trigger phrases and keep one short line for the `/` menu.
+
+**Script permissions**: when the body runs the skill's own scripts, pre-approve exactly those command shapes in `allowed-tools`, written the way `pr-draft/SKILL.md` writes its rule. Leave out any script with external side effects so it still asks first.
 
 **Body:** a `# Title` heading and numbered, executable steps with exact commands. Reference bundled files through Claude Code's skill-directory variable: a dollar sign followed by `{CLAUDE_SKILL_DIR}` and the path, exactly as `pr-draft/SKILL.md` writes it (this file cannot spell it in one piece, because Claude Code would expand it to skill-create's own path). Reach a sibling skill's file with `/../<sibling>/…` after it. It expands only in SKILL.md and in `allowed-tools`, so inside `references/` write the installed path, `~/.claude/skills/<skill>/…`, instead. No placeholders, no leftover `<!-- … -->` comments. Match the collection's house style.
 
@@ -76,11 +82,11 @@ Before installing, sanity-check that it will actually fire and run:
 - **Trigger fit**: check the description against the 2-3 SHOULD-fire prompts and the one must-NOT-fire prompt from Step 4. Adjust the description if it under- or over-triggers.
 - **Dry run**: walk the steps against one realistic prompt. Every command must be runnable exactly as written; run the read-only steps to confirm the paths and tools exist. Fix any step that is vague or broken.
 
-For a high-stakes or to-be-distributed skill, use Anthropic's official `skill-creator` for a full eval/benchmark loop and `.skill` packaging: this step is the lightweight local equivalent.
+For a high-stakes skill, measure triggering with `claude plugin eval` (should-fire and must-not-fire prompts, each run with and without the skill; see `claude plugin eval --help`) rather than skill-creator's description optimizer, which tests a slash command instead of the skill: this step is the lightweight local equivalent.
 
 ## Step 8: Self-review (required)
 
-- [ ] `description` is imperative, names *when* to use it, and ends with concrete `Triggers on phrases like '…'`; triggers are specific, not generic verbs.
+- [ ] `description` puts the key use first, draws the boundary with any neighbor skill, and ends with two or three real `Triggers on phrases like '…'` (none on a manual-only skill); at most 450 characters, no `<`, `>`, or em-dash.
 - [ ] `SKILL.md` holds the essentials only; long content is split into `references/` (with a TOC), deterministic logic lives in `scripts/`, templates in `assets/`.
 - [ ] Every step is executable with an exact command; bundled files go through the skill-directory variable (as in `pr-draft/SKILL.md`), never a hardcoded install path.
 - [ ] No placeholders and no leftover `<!-- … -->` comments; correct domain prefix.
@@ -94,7 +100,7 @@ Skills are matched by their description and trigger phrases, so vague writing he
 just install && just list | grep <frontmatter-name>
 ```
 
-`just list` prints frontmatter `name:` values, so grep the name set in the SKILL.md. If it appears, propose committing (match the style of `git log --oneline -10`):
+`just list` prints frontmatter `name:` values, so grep the name set in the SKILL.md. Add the skill's row to the README `Skills` table (a manual-only row starts with ``(`/<name>` only, manual)``), then run `just check` and fix every `FAIL`. Once it passes, propose committing (match the style of `git log --oneline -10`):
 
 ```bash
 git add <skill-name>/ && git commit -m "feat: add <skill-name> skill"
