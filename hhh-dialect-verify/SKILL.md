@@ -2,6 +2,7 @@
 name: hhh-dialect-verify
 description: "Run the Hibernate ORM test suite against CUBRID and measure a dialect change's impact: total failures, +N recovered / −N regressed vs a baseline, and failures grouped by signature/family. Use when verifying a CUBRIDDialect change, an auto_quote or capability-flag toggle, or any Hibernate-vs-CUBRID compatibility measurement. Pairs with the report skill (verify → numbers → 비교 분석 보고서). Triggers on phrases like 'dialect 검증', 'CUBRID 테스트 돌려', 'hibernate 스위트 실행', 'pass/fail 델타 측정', 'run the hibernate suite against CUBRID', 'measure dialect change'."
 argument-hint: "[CUBRID version: 10.2|11.4] [--tests <filter>]"
+disable-model-invocation: true
 ---
 
 # Hibernate ORM × CUBRID dialect verification

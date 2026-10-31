@@ -85,4 +85,4 @@ A gha-ci 공통 line also shows what newer develop does. `(base 4f1a68c 실패 �
 
 Report the classification and the recommendation. To act, the user does it: re-running a CircleCI job needs a token, a gha-ci re-run is a PR comment (`/run all`, `/run rerun <run-id>`), and updating the base means pushing. Show the relevant link (the script prints each failed check's URL) so they can act from there.
 
-If the base needs updating on a bump PR, the **submodule-bump** skill's `--status` shows whether an open bump PR already covers the submodule head.
+If the base needs updating on a bump PR, point the user to `/submodule-bump --status` (a manual-only skill), which shows whether an open bump PR already covers the submodule head.

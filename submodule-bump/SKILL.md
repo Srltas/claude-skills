@@ -2,6 +2,7 @@
 name: submodule-bump
 description: "Pin a CUBRID submodule to a specific commit by dispatching the parent repo's 'Submodule bump (receiver)' GitHub Action, which opens or updates the bump PR on CUBRID/cubrid. Takes a submodule (cubrid-jdbc, cubrid-cci, cubridmanager: the short forms jdbc, cci, cms and the repo name cubrid-manager-server also work) and a commit SHA (or 'latest' for that submodule's develop head). Validates the submodule, the SHA, and the direction of the move before anything is dispatched, and shows the exact command for confirmation first. `--status` is a read-only overview: with no submodule it reports all three (pinned, head, how many commits behind, the open bump PR), and with one it lists that submodule's pending commits so you can pick how far to bump. Use when the automatic bump is stuck, when several submodule commits piled up and you want to catch up in one go, or when you need to pin one specific commit. Triggers on phrases like '서브모듈 상태 확인', '밀린 서브모듈 있나', '서브모듈 SHA 반영', 'jdbc 최신으로 올려줘', 'cci SHA 반영해줘', 'submodule bump 실행', 'cubridmanager SHA 바꿔줘'."
 argument-hint: "[jdbc|cci|cms] <sha|latest|--status> [--reanchor]"
+disable-model-invocation: true
 ---
 
 # Bump a CUBRID submodule to a commit

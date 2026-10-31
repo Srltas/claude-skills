@@ -8,24 +8,24 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 |-------|-------------|
 | `skill-create` | Scaffold a new skill in this collection from a workflow you just did |
 | `commit` | Commit staged changes with a clean Conventional Commit subject |
-| `submodule-bump` | Show what each CUBRID submodule is pinned to and what is pending (`--status`), and pin one (cubrid-jdbc / cubrid-cci / cubridmanager) to a commit by dispatching the parent repo's bump Action, with validation before anything is dispatched |
+| `submodule-bump` | (`/submodule-bump` only, manual) Show what each CUBRID submodule is pinned to and what is pending (`--status`), and pin one (cubrid-jdbc / cubrid-cci / cubridmanager) to a commit by dispatching the parent repo's bump Action, with validation before anything is dispatched |
 | `cubrid-manual` | Look up CUBRID engine behavior in the version-pinned online manual |
 | `cmt-manual` | Look up CUBRID Migration Toolkit (CMT) behavior in the online manual |
 | `report` | Generate a CUBRID-house-style Korean analysis report as a Word (.docx): docx-js, Mermaid/SVG diagrams (Kroki) + matplotlib charts, with a structure check and a page-by-page visual render |
-| `hhh-dialect-verify` | Run the hibernate-core suite against CUBRID, diff pass/fail vs a baseline, classify failures by family |
-| `hhh-dialect-verify-report` | One-shot: run the suite (one/all CUBRID versions) → diff vs a baseline → always write the .docx report |
-| `jdbc-ctp-verify-report` | One-shot: build the CUBRID JDBC driver → run the CTP suite → diff vs a baseline → classify → always write the .docx report |
+| `hhh-dialect-verify` | (`/hhh-dialect-verify` only, manual) Run the hibernate-core suite against CUBRID, diff pass/fail vs a baseline, classify failures by family |
+| `hhh-dialect-verify-report` | (`/hhh-dialect-verify-report` only, manual) One-shot: run the suite (one/all CUBRID versions) → diff vs a baseline → always write the .docx report |
+| `jdbc-ctp-verify-report` | (`/jdbc-ctp-verify-report` only, manual) One-shot: build the CUBRID JDBC driver → run the CTP suite → diff vs a baseline → classify → always write the .docx report |
 | `jira-fetch` | Download a Jira Server issue (e.g. CUBRID CBRD) to a local Markdown file and load it as working context (wraps `Srltas/jira-to-md-downloader`; publicly readable CUBRID projects only, internal ones such as CUBRIDQA return 401; Atlassian Cloud not supported as-is) |
 | `jira-draft` | Draft a CUBRID JIRA issue (bug/task) as copy-paste text: concise English title, Korean 개조식 body under English section headers. The reverse of jira-fetch |
 | `tutor` | (`/tutor` only, manual) Patient expert teacher for the current work or a topic: defines every term first, then teaches step by step, grounded in real code/manuals, with comprehension checks. Korean, chat-only |
-| `blog` | Draft a Korean tech blog post for velog (minimal text, visuals-first): scaffolds `work-docs/blog/<date>-<slug>/`, renders diagrams to images via Kroki (velog can't render Mermaid) + matplotlib charts |
+| `blog` | (`/blog` only, manual) Draft a Korean tech blog post for velog (minimal text, visuals-first): scaffolds `work-docs/blog/<date>-<slug>/`, renders diagrams to images via Kroki (velog can't render Mermaid) + matplotlib charts |
 | `java-format` | Apply google-java-format (AOSP, in place) to changed / staged / all / specific Java files; asks the version, resolves the jar via `GJF_JAR`/`GJF_DIR`/cache or auto-downloads it |
 | `pr-draft` | Draft a PR title (`[XXX-0000]` + easy English) and Korean body (Purpose / Implementation / Remarks) from the current branch's commits and diff; draft only |
 | `self-review` | Review your own in-progress change as a hostile reviewer before any PR exists: gathers the contract (issue AC, commits, sibling conventions), runs nine passes in parallel subagents, and reports what you missed. Analysis only |
 | `pr-review` | Review someone else's PR in depth from a URL (+ optional Jira key): fetches the whole repo as a detached worktree, reads every changed file, establishes why the code is that way before calling anything a defect, and reports to you. Posts nothing |
 | `review-triage` | Fetch your PR's review comments (human + bot), judge each against the real code, and draft a Korean summary + fix plan (valid) or reasoned reply (not valid); analysis only |
 | `ci-check` | Triage a CUBRID PR's CI: classify each failing test as 공통 / flaky / 고유 (CircleCI against other PRs' runs, gha-ci against develop's nightly verdicts at the PR's base and newer, then other PRs' recent runs), report base staleness, and say whether to re-run, update the base, or investigate |
-| `weekly-report` | Turn a list of JIRA issue keys into one short Korean line per issue (via jira-fetch), ready to paste into the weekly-report sheet |
+| `weekly-report` | (`/weekly-report` only, manual) Turn a list of JIRA issue keys into one short Korean line per issue (via jira-fetch), ready to paste into the weekly-report sheet |
 | `worklog` | Record issue work as a Markdown note in your public `work-docs` repo (`<KEY>/<KEY>-<slug>.md`), a shareable PR-linkable trail that complements the internal master DOCX |
 | `note` | Record a non-issue exploration note (PoC, review, code analysis) in the public `work-docs` repo (`<category>/<YYYY-MM-DD>-<slug>.md`) |
 
