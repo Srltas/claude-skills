@@ -1,6 +1,6 @@
 ---
 name: blog
-description: "Draft a Korean IT/tech blog post for velog, minimal prose and visuals-first. Give it a slug (and topic) and it scaffolds work-docs/blog/<date>-<slug>/index.md, writes a tight Korean post (요약/들어가며/핵심/정리/참고), and renders every concept as an IMAGE because velog does NOT render Mermaid: diagram-as-code via Kroki, data charts via matplotlib, optional Excalidraw. Grounded in real code and manuals. Saves the draft to the public work-docs repo; you publish on velog. Triggers on phrases like '블로그 초안 작성', 'velog 글 써줘', '이거 블로그로 정리', 'write a tech blog draft', 'blog post about'."
+description: "Draft a Korean tech blog post for velog in the public work-docs repo: short text, with every diagram and chart rendered as an image because velog does not render Mermaid. You publish it on velog yourself."
 argument-hint: "<slug> [topic]"
 disable-model-invocation: true
 ---

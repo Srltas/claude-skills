@@ -1,6 +1,6 @@
 ---
 name: note
-description: "Record an exploration note (PoC, review, code analysis, or any work without a JIRA issue) as a Markdown file in your public work-docs repo. Give it a free-form category and a slug and it scaffolds <category>/<YYYY-MM-DD>-<slug>.md from an exploration template (목적/배경/범위·방법/발견/결론/다음 단계/참고), fills it from the session, and commits it. While researching, actively use the collection's lookup/analysis skills (cubrid-manual, cmt-manual, and Understand-Anything if installed) so findings are verified, not asserted from memory. Complements the worklog skill, which is for issue-keyed work. The repo is PUBLIC, so keep internal-only detail in the master DOCX. Triggers on phrases like 'PoC 노트 남겨', '검토 노트 작성', '코드 분석 기록', 'record an exploration note', 'note this analysis'."
+description: "Record an exploration note (PoC, review, code analysis, or other work without a Jira issue) as Markdown in the public work-docs repo, filled from the session and committed. For issue work, use worklog; for a Word report, use report. Triggers on phrases like '노트로 남겨줘', '분석 내용 기록해두자', 'PoC 노트 작성'."
 argument-hint: "<category> <slug>"
 ---
 

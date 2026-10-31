@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: "Review SOMEONE ELSE'S pull request in depth, from a PR URL (or number) plus an optional Jira issue key. Fetches the whole repository locally as a detached git worktree (never touching your own branches or checkout), reads every changed file in full with no sampling, and establishes why the code is the way it is (git log, git blame, the PR body, the linked issue, prior PRs on the same files) before calling anything a defect: whatever it cannot ground is asked as a question to the author instead. Fans thirteen review passes out to parallel subagents, then merges them into one ranked Korean report with file:line evidence, split into 결함 / 판단 사항 / 범위 밖 / 질문. It reports to you and posts NOTHING: no review, no comment, no code edit. To judge review comments left on your own PR, use review-triage instead; to check your own unpushed work, use self-review. Triggers on phrases like '이 PR 리뷰해줘', 'PR 코드 리뷰 부탁해', '남의 PR 검토해줘', '이 풀리퀘 꼼꼼히 봐줘', 'review this PR', 'review someone else's pull request', 'deep review of PR 1629'."
+description: "Review someone else's pull request in depth from its URL or number: reads every changed file in a separate worktree, learns why the code is the way it is before calling a defect, and returns a ranked Korean report of defects, judgment calls, and questions. Posts nothing. For your own work use self-review; for comments on your PR use review-triage. Triggers on phrases like '이 PR 리뷰해줘', '남의 PR 검토해줘'."
 argument-hint: "[PR URL or number] [optional JIRA key]"
 ---
 

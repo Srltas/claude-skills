@@ -1,6 +1,6 @@
 ---
 name: review-triage
-description: "Triage the review comments on your pull request. Fetches a PR's reviews (inline code comments, review summaries, and PR-level comments, from humans and bots) and, for each, gives an easy Korean summary, then judges it on the evidence (the actual code, the manual/spec, and this PR's own scope) instead of on the reviewer's authority, and either drafts a fix plan (valid) or a reasoned reply saying why not (wrong, already handled, out of scope, or style). Analysis and drafts only: it does not post replies or change code. Use when your PR has review feedback you want to understand and respond to. Triggers on phrases like 'PR 리뷰 정리해줘', '리뷰 코멘트 타당한지 봐줘', '리뷰 대응', 'triage my PR reviews', 'help me respond to PR review'."
+description: "Triage the review comments on your own pull request, from people or AI bots: summarize each in easy Korean, judge it on the code, the spec, and the PR's scope rather than the reviewer's authority, then draft a fix plan or a reasoned reply. Posts nothing and changes no code. Triggers on phrases like '리뷰가 달렸어', 'AI 리뷰 지적이 타당한지 봐줘', '리뷰 대응'."
 argument-hint: "[PR number or URL]"
 allowed-tools:
   - Bash

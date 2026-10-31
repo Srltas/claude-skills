@@ -1,6 +1,6 @@
 ---
 name: pr-draft
-description: "Draft a pull request (title + body) from the current branch's commits and diff. The title is [XXX-0000] plus a concise, easy-to-understand English summary (the key is taken from the branch name); the body is Korean in three sections: Purpose (required, why this PR exists), Implementation (optional, how it was built), Remarks (optional, notes). Optional sections become N/A when empty. Passing `--tc` switches to a compact TC template for CMT (cubrid-migration) unit-test PRs only, summarized in a few lines with real counts (@Nested groups, tests run, `// DEFECT:` markers, suite before -> after); it is never selected automatically. Produces a copy-paste draft only; it does not create the PR. Triggers on phrases like 'PR 초안 작성', 'pr-draft', '이 브랜치 PR로 정리', 'draft a PR', 'PR 제목이랑 본문 만들어줘'."
+description: "Draft a pull request title and body from the current branch's commits and diff: a [KEY] title with a short English summary and a Korean body (Purpose, Implementation, Remarks), ready to paste. Draft only, never creates the PR. With --tc, only when asked, it uses a compact template for CMT unit-test PRs. Triggers on phrases like 'PR 초안 작성해줘', 'TC PR 초안', '이 브랜치 PR로 정리'."
 argument-hint: "[base-branch] [--tc for CMT unit-test PR]"
 ---
 

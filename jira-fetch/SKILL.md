@@ -1,6 +1,6 @@
 ---
 name: jira-fetch
-description: "Download a JIRA issue to a local Markdown file to use as working context, via the Srltas/jira-to-md-downloader tool. Give it one or more issue keys or issue URLs (e.g. CBRD-1234, TOOLS-4888, APIS-1079, or a pasted http://jira.cubrid.org/browse/CBRD-1234) and it fetches each issue's summary + description as <KEY>.md, then loads it into the session so you can work against the ticket. Built for Jira Server/Data Center (REST API v2 + HTTP Basic auth); the target is CUBRID's Jira Server at jira.cubrid.org, and it reaches the publicly readable projects (CBRD, TOOLS, APIS, ...) only: internal-only projects such as CUBRIDQA return HTTP 401 and are not supported, and any other Jira Server instance works by setting JIRA_URL. Atlassian Cloud (e.g. Hibernate HHH at hibernate.atlassian.net) is NOT supported as-is. It is the reverse of writing an issue up to JIRA. Triggers on phrases like 'CBRD-1234 내용 가져와', '이 이슈 md로 내려받아', 'jira 이슈 다운로드해서 참고', 'fetch jira issue as markdown'."
+description: "Fetch CUBRID Jira issues as Markdown and load them as working context. Use it whenever a key like CBRD-1234 or a jira.cubrid.org link comes up and the issue content matters. Public projects only (CBRD, TOOLS, APIS); CUBRIDQA and Atlassian Cloud (HHH) cannot be fetched. To write a new issue, use jira-draft. Triggers on phrases like 'CBRD-1234 내용 가져와', '이 이슈 참고해서 작업하자'."
 argument-hint: "<ISSUE-KEY> [ISSUE-KEY...] [-o out-dir]"
 ---
 

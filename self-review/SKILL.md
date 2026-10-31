@@ -1,6 +1,6 @@
 ---
 name: self-review
-description: "Review your OWN in-progress change as a hostile stranger would, before any PR exists: run it mid-work or right before pushing. Gathers the contract first (Jira issue AC, commit messages, the diff's own claim, sibling conventions), then runs nine passes (contract conformance, completeness, premise verification, semantic delta, failure paths, blind spots, blast radius, convention, naming) and fans them out to parallel subagents so each angle is judged independently, then merges them into one ranked Korean finding list with file:line evidence. Its job is to counteract author tunnel vision by hunting the cases you never considered, including uncommitted and untracked work. Local analysis only: it never edits, commits, or posts. For judging other people's review comments on an existing PR, use review-triage instead. Triggers on phrases like '내 코드 셀프 리뷰', '푸시 전에 검토해줘', '작업 중인 변경 리뷰해줘', '빠뜨린 케이스 없는지 봐줘', '커밋 전에 스스로 리뷰', 'self-review my changes', 'review my own work before I push', 'what did I miss in this change'."
+description: "Review your own in-progress change before it becomes a PR, the way a hostile stranger would: check it against the issue and commit messages, hunt the cases you missed (uncommitted and untracked files included), and report ranked Korean findings with file:line evidence. Changes nothing. For someone else's PR use pr-review; for comments on your PR use review-triage. Triggers on phrases like '푸시 전에 검토해줘', '빠뜨린 케이스 없는지 봐줘', '셀프 리뷰'."
 argument-hint: "[base ref] [issue key]"
 ---
 

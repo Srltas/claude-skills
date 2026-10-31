@@ -1,6 +1,6 @@
 ---
 name: ci-check
-description: "Check a CUBRID PR's CI and, when a test job failed, work out whether it is your change, a project-wide failure, a stale base, or a flaky test. Reads the PR's checks and pulls the failing tests from whichever system ran them: CircleCI, classified against recent runs of the same job on other PRs, or the self-hosted GitHub Actions gha-ci workflow (started by `/run` PR comments), classified against develop's own nightly verdicts at the PR's base and newest develop, then other PRs' recent runs. Labels each one 공통 (fails elsewhere or on develop too, not yours), flaky (result flips between runs), 고유 (fails only here). Also reports how far the PR's base is behind, and shows the failure output for the PR-specific ones. Answers 're-run, update the base, or actually investigate?'. Analysis only: it does not re-run CI, comment on the PR, or push anything. Triggers on phrases like 'CI 왜 깨졌어', 'CI 실패 원인 확인', '이 PR CI 확인해줘', 'gha-ci 왜 실패했어', 'flaky인지 봐줘', '재실행하면 되는지 확인', 'why did CI fail on this PR'."
+description: "Explain why a CUBRID PR's CI failed, on CircleCI or the gha-ci workflow: label each failing test 공통 (fails elsewhere too), flaky, or 고유 (only this PR), and report how far the base is behind, so you know whether to re-run, update the base, or investigate. Analysis only. Triggers on phrases like 'CI 왜 깨졌어', 'CI 실패 원인 확인', 'flaky인지 봐줘'."
 argument-hint: "[PR number or URL, or a gha-ci run URL]"
 allowed-tools:
   - Bash

@@ -1,6 +1,6 @@
 ---
 name: weekly-report
-description: "Turn a list of JIRA issue keys into one short Korean line per issue, ready to paste into a weekly-report spreadsheet (one line per cell). Give it several keys (e.g. APIS-1111, TOOLS-4324) and it fetches each issue with the jira-fetch skill, reads the description, and compresses it into a single 개조식 line ending in 명사형: 대상 + 무엇을 하는가, no procedures or checklists. Summarizes what the issue IS, not progress or status. Use when writing the weekly report and you need each issue boiled down to one line. Triggers on phrases like '주간보고 정리', '주간 보고용으로 요약', '이 이슈들 한 줄로 정리', '주간보고 한 줄씩 만들어줘', 'weekly report lines for these issues'."
+description: "Turn a list of Jira issue keys into one short Korean line per issue for the weekly-report sheet (개조식, 명사형 종결), fetched with jira-fetch. Summarizes what each issue is, not its progress."
 argument-hint: "<ISSUE-KEY> [ISSUE-KEY...]"
 disable-model-invocation: true
 allowed-tools:

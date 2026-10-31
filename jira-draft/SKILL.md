@@ -1,6 +1,6 @@
 ---
 name: jira-draft
-description: "Draft a CUBRID JIRA issue (bug or task) with a concise English title and a Korean body under English section headers (Description as easy-to-read prose; the other sections in bullet style, 개조식). Use when you need to write up a CUBRID JIRA issue from the current work: a bug report (Description / Test Build / Repro / Expected / Actual / Additional Info) or a task/improvement (Description / Specification Changes / Implementation / Acceptance Criteria / Definition of Done). Produces a copy-paste draft only; it does not post to JIRA. It is the reverse of jira-fetch (which downloads an issue). Triggers on phrases like 'CUBRID JIRA 이슈 작성', 'jira 버그 리포트 초안', '이 작업 jira 이슈로 정리', 'draft a CUBRID jira issue', 'write a jira bug report'."
+description: "Draft a CUBRID Jira issue (bug or task) from the current work, or redraft an existing one: a short English title and a Korean body under English section headers, ready to paste. Draft only, never posts. To read an issue, use jira-fetch. Triggers on phrases like 'jira 이슈 초안 작성해줘', 'CBRD 이슈 초안', '이 작업 jira 이슈로 정리'."
 argument-hint: "bug|task [subject]"
 ---
 

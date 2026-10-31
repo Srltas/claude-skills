@@ -1,6 +1,6 @@
 ---
 name: skill-create
-description: "Create a new skill in this claude-skills collection, from scaffolding through a lightweight trigger/dry-run test before commit. Use when the user wants to turn a workflow they just did into a reusable skill, capture a repeated process, or add a new skill to their toolbox. Applies this collection's conventions (domain prefixes, description-with-triggers, just install) plus skill-authoring practices from Anthropic's skill-creator (progressive disclosure, trigger-tested descriptions, bundled scripts/references/assets). Triggers on phrases like 'make this a skill', 'create a skill for this', 'save this as a skill', 'add a new skill', 'turn this workflow into a skill'."
+description: "Turn a workflow you just did into a new skill in the claude-skills collection: pick a name with the collection's prefixes, write a trigger-tested SKILL.md plus any scripts, test it, install it, and propose a commit. Triggers on phrases like '이 작업 스킬로 만들어줘', '스킬 새로 만들어줘', 'make this a skill'."
 argument-hint: "<skill-name-or-description>"
 ---
 

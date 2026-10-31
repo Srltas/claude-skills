@@ -1,6 +1,6 @@
 ---
 name: commit
-description: "Commit staged changes with a clean, single-line Conventional Commit subject in plain developer English. Use when the user wants to commit changes, write a commit message, or wrap up work with a conventional-commit title. Generates a `type(scope): summary` subject from the staged diff and commits it. Triggers on phrases like 'commit this', 'make a commit', 'write a commit message', 'git commit', 'commit my changes'."
+description: "Commit the staged changes with a single-line Conventional Commit subject, type(scope): summary, written in plain English from the staged diff. Never pushes. Triggers on phrases like '커밋해줘', '커밋 메시지 다시 작성해줘', 'commit this'."
 argument-hint: "[optional message hint or scope]"
 ---
 

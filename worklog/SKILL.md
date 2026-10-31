@@ -1,6 +1,6 @@
 ---
 name: worklog
-description: "Record a piece of issue work as a Markdown note in your public work-docs repo, for a shareable, PR-linkable trail (the GitHub-visible record that complements the internal master DOCX). Give it a CUBRID Jira key (CBRD, TOOLS, APIS, CUBRIDQA, ...) or a Hibernate HHH key (or a topic slug) and it scaffolds <KEY>/<KEY>-<slug>.md from a consistent template (배경/원인/변경/검증/결과/링크), fills it from the session's work, and commits it. Pairs with jira-fetch for issue context. The repo is PUBLIC: keep internal-only detail in the master DOCX. Triggers on phrases like '작업 기록 남겨', 'worklog 작성', '이 이슈 문서로 정리해서 커밋', 'record this issue's work as markdown', 'publish a work note for CBRD-1234'."
+description: "Record issue work (a CUBRID Jira or Hibernate HHH key) as a Markdown note in the public work-docs repo, filled from the session (background, cause, change, verification, result) and committed. For work without an issue, use note. Triggers on phrases like '작업 기록 남겨줘', 'worklog 작성', '이 이슈 문서로 정리해서 커밋'."
 argument-hint: "<ISSUE-KEY|topic> [slug]"
 ---
 

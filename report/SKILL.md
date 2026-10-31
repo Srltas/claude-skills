@@ -1,6 +1,6 @@
 ---
 name: report
-description: "Generate a CUBRID-house-style Korean analysis report as a Word (.docx): error analyses, code analyses, issue write-ups, before/after comparisons, and status/investigation reports. Builds the .docx with docx-js (the engine behind Anthropic's docx skill) from a JSON spec, embedding matplotlib charts, reproducing the exact design: centered cover (navy 23pt title), auto table of contents, navy/blue numbered headings, and bordered tables with row-level color coding (sky-blue header, green pass rows, red fail rows). Use when the user wants a Word report or structured document summarizing analysis, findings, comparisons, or current status of Hibernate/JDBC/CUBRID work. Triggers on phrases like 'write a report', '보고서 만들어', 'Word 문서로 정리', 'docx로 작성', 'analysis report', '검증 보고서', '비교 분석 문서'."
+description: "Write a Korean analysis report as a Word (.docx) file in the CUBRID house style, with charts, diagrams, and color-coded result tables. Use for analysis, comparison, verification, or status reports on Hibernate, JDBC, or CUBRID work, for the team or the team lead. For Markdown notes, use note or worklog. Triggers on phrases like '보고서 만들어', 'Word 문서로 정리', '보고용 문서 작성'."
 argument-hint: "[report type] <topic / what to report on>"
 ---
 
