@@ -89,7 +89,11 @@ The reader should get it by skimming. Shape is not a matter of taste: **the shap
 
 Rules: **Description is 서술체** (one or two easy paragraphs), **every other section is 개조식** (one line per item, essentials only). Do not drop an empty section: leave `없음` or `(확인 필요)` (only `Additional Information` may be omitted when there is nothing). No em-dash (`—`): use commas, colons, parentheses, periods.
 
-## Step 4: Output
+## Step 4: Check for duplicates
+
+For a new issue (not a redraft of an existing one), run the **jira-dup-check** skill on the draft's title and Description, searching the project it will be filed in. Put its report under the draft. If it judges an existing issue 중복, say so before the draft and recommend adding to that issue instead of filing a new one.
+
+## Step 5: Output
 
 Print the draft in one copy-paste block: the English title line, then the Korean body. Do not post to JIRA: tell the user to paste it into a new CUBRID JIRA issue.
 

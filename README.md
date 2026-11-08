@@ -16,7 +16,8 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `hhh-dialect-verify-report` | (`/hhh-dialect-verify-report` only, manual) One-shot: run the suite (one/all CUBRID versions) → diff vs a baseline → always write the .docx report |
 | `jdbc-ctp-verify-report` | (`/jdbc-ctp-verify-report` only, manual) One-shot: build the CUBRID JDBC driver → run the CTP suite → diff vs a baseline → classify → always write the .docx report |
 | `jira-fetch` | Download a Jira Server issue (e.g. CUBRID CBRD) to a local Markdown file and load it as working context (wraps `Srltas/jira-to-md-downloader`; reads every project the configured CUBRID account can open, CUBRIDQA included; Atlassian Cloud not supported as-is) |
-| `jira-draft` | Draft a CUBRID JIRA issue (bug/task) as copy-paste text: concise English title, Korean 개조식 body under English section headers. The reverse of jira-fetch |
+| `jira-draft` | Draft a CUBRID JIRA issue (bug/task) as copy-paste text: concise English title, Korean 개조식 body under English section headers, checked for duplicates with jira-dup-check. The reverse of jira-fetch |
+| `jira-dup-check` | Check a CUBRID Jira draft for existing duplicate or related issues before it is filed: searches several Korean and English phrasings through the REST API, merges the hits, and judges each candidate (중복 / 관련 / 무관) with reasons. Its search script also runs as a plain CLI |
 | `tutor` | (`/tutor` only, manual) Patient expert teacher for the current work or a topic: defines every term first, then teaches step by step, grounded in real code/manuals, with comprehension checks. Korean, chat-only |
 | `blog` | (`/blog` only, manual) Draft a Korean tech blog post for velog (minimal text, visuals-first): scaffolds `work-docs/blog/<date>-<slug>/`, renders diagrams to images via Kroki (velog can't render Mermaid) + matplotlib charts |
 | `java-format` | Apply google-java-format (AOSP, in place) to changed / staged / all / specific Java files; asks the version, resolves the jar via `GJF_JAR`/`GJF_DIR`/cache or auto-downloads it |
@@ -64,7 +65,7 @@ Use one way per machine: `npx skills` manages copies, `just install` links to th
 
 ## Trigger evals
 
-`evals/` checks that Claude picks the right skill among neighbors that are easy to mix up (worklog, note, report; self-review, pr-review, review-triage; jira-fetch, jira-draft) and picks none for a nearby general question. Each case is a prompt a user might type, a `graders/fires-<skill>.md` for the skill that must be invoked, and a `graders/not-<skill>.md` for each skill that must not be. `just eval` runs the cases with [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) on a temporary plugin built from these skills:
+`evals/` checks that Claude picks the right skill among neighbors that are easy to mix up (worklog, note, report; self-review, pr-review, review-triage; jira-fetch, jira-draft, jira-dup-check) and picks none for a nearby general question. Each case is a prompt a user might type, a `graders/fires-<skill>.md` for the skill that must be invoked, and a `graders/not-<skill>.md` for each skill that must not be. `just eval` runs the cases with [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals) on a temporary plugin built from these skills:
 
 ```bash
 just eval                              # every case, 3 runs each
