@@ -17,6 +17,7 @@ summary and description only: comments added after the duplicate was filed
 often name it, which would leak the answer.
 """
 import argparse
+import datetime
 import json
 import os
 import re
@@ -40,9 +41,14 @@ def fetch_all(jira, jql, fields):
             return issues
 
 
-def jql_time(created):
-    """'2026-10-28T14:03:12.000+0900' -> '2026-10-28 14:03' (the server's local time)."""
-    return created[:16].replace('T', ' ')
+def next_minute(created):
+    """'2026-10-28T14:03:12.000+0900' -> '2026-10-28 14:04' in the server's local time.
+
+    JQL compares whole minutes, and issues filed in one batch share a minute, so the query
+    keeps that minute and score() drops what came after the duplicate by the exact time.
+    """
+    minute = datetime.datetime.strptime(created[:16], '%Y-%m-%dT%H:%M') + datetime.timedelta(minutes=1)
+    return minute.strftime('%Y-%m-%d %H:%M')
 
 
 def has_hangul(text):
@@ -106,10 +112,10 @@ def score(args):
             phrases, raw = [' OR '.join(sj.clean(g['summary'], wildcard=False).split())], True
         else:
             phrases = queries.get(g['key'], [])
-        ranked, log = sj.find(jira, phrases, args.project, args.per_phrase, jql_time(g['created']), {g['key']},
+        ranked, log = sj.find(jira, phrases, args.project, args.per_phrase, next_minute(g['created']), {g['key']},
                               args.search_fields, wildcard=not args.baseline, raw=raw,
                               title=g['summary'] if args.with_title else None)
-        keys = [k for k, _, _ in ranked]
+        keys = [k for k, issue, _ in ranked if issue['fields']['created'] < g['created']]
         rank = min((keys.index(o) + 1 for o in g['originals'] if o in keys), default=None)
         results.append({'key': g['key'], 'languages': g['languages'], 'rank': rank,
                         'originals': g['originals'], 'queries': log})
