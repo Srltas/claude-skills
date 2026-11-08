@@ -4,7 +4,8 @@
 Fails on: a name that does not match its directory; a description that is missing, not one
 double-quoted line, longer than MAX_DESC, or contains '<', '>' or an em-dash; trigger phrases
 on a manual-only skill or none on an auto-invoked one; a leftover <skill-base-dir> placeholder
-or a hardcoded ~/.claude/skills path in SKILL.md; a README skill table that does not match the
+or a hardcoded ~/.claude/skills path in SKILL.md; a dollar sign followed by a digit in SKILL.md
+(Claude Code replaces it with a skill argument); a README skill table that does not match the
 skills. Warns when a skill is not linked into ~/.claude/skills.
 """
 import os
@@ -15,6 +16,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.path.expanduser('~/.claude/skills')
 MAX_DESC = 450
 HARDCODED = re.compile(r'(~|\$HOME|\$\{HOME\})/\.claude/skills/[A-Za-z0-9_-]+/(assets|scripts|references)/')
+ARG_REF = re.compile(r'\$\d')
 MANUAL_MARK = '(`/{}` only, manual)'
 
 errors, warnings = [], []
@@ -53,6 +55,8 @@ for d in skills:
         errors.append(f'{where}: <skill-base-dir> placeholder left (use the CLAUDE_SKILL_DIR variable)')
     if HARDCODED.search(text):
         errors.append(f'{where}: hardcoded ~/.claude/skills path (use the CLAUDE_SKILL_DIR variable)')
+    if ARG_REF.search(text):
+        errors.append(f'{where}: a dollar sign before a digit becomes a skill argument when the skill runs (write "0.10 USD")')
     if os.path.realpath(os.path.join(SKILLS_DIR, d)) != os.path.realpath(os.path.join(ROOT, d)):
         warnings.append(f'{d}: not linked into {SKILLS_DIR} (run just install)')
 

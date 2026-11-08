@@ -88,7 +88,7 @@ Before installing, sanity-check that it will actually fire and run:
 - **Trigger fit**: check the description against the 2-3 SHOULD-fire prompts and the one must-NOT-fire prompt from Step 4. Adjust the description if it under- or over-triggers.
 - **Dry run**: walk the steps against one realistic prompt. Every command must be runnable exactly as written; run the read-only steps to confirm the paths and tools exist. Fix any step that is vague or broken.
 
-When the skill could be mistaken for a neighbor, measure it: copy a case under `<collection-root>/evals/`, put a should-fire prompt in `prompt.md`, keep `graders/fires-<name>.md` and one `graders/not-<neighbor>.md` per neighbor, then run `just eval --case <case>` (about $0.10 per run; see the README's Trigger evals). Use this rather than skill-creator's description optimizer, which tests a slash command instead of the skill.
+When the skill could be mistaken for a neighbor, measure it: copy a case under `<collection-root>/evals/`, put a should-fire prompt in `prompt.md`, keep `graders/fires-<name>.md` and one `graders/not-<neighbor>.md` per neighbor, then run `just eval --case <case>` (about 0.10 USD per run; see the README's Trigger evals). Use this rather than skill-creator's description optimizer, which tests a slash command instead of the skill.
 
 ## Step 8: Self-review (required)
 
