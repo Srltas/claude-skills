@@ -73,6 +73,8 @@ error: JIRA credentials not set. Export them (or put them in $TOOL_DIR/.envrc):
 EOF
   exit 2
 fi
+# http:// redirects to https:// and double-encodes any query string on the way
+JIRA_URL="${JIRA_URL/#http:\/\/jira.cubrid.org/https://jira.cubrid.org}"
 
 echo "· fetching: ${KEYS[*]}  ->  $OUTDIR_ABS" >&2
 # One unreadable key must not abort the batch: report per-key below instead.
@@ -87,8 +89,7 @@ done
 if [ $rc -ne 0 ]; then
   cat >&2 <<'EOF'
 note: a missing issue is almost always one of
-  HTTP 401  the configured account cannot read it. Internal-only projects (CUBRIDQA) are NOT
-            reachable from this tool: open those in the browser instead.
+  HTTP 401  the configured account cannot open it (check it in the browser with that account).
   HTTP 404  wrong or non-existent key.
 EOF
 fi

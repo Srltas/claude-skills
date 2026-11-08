@@ -1,6 +1,6 @@
 ---
 name: jira-fetch
-description: "Fetch CUBRID Jira issues as Markdown and load them as working context. Use it whenever a key like CBRD-1234 or a jira.cubrid.org link comes up and the issue content matters. Public projects only (CBRD, TOOLS, APIS); CUBRIDQA and Atlassian Cloud (HHH) cannot be fetched. To write a new issue, use jira-draft. Triggers on phrases like 'CBRD-1234 내용 가져와', '이 이슈 참고해서 작업하자'."
+description: "Fetch CUBRID Jira issues as Markdown and load them as working context. Use it whenever a key like CBRD-1234 or a jira.cubrid.org link comes up and the issue content matters. Reads every project the CUBRID account can open, CUBRIDQA included; Atlassian Cloud (HHH) cannot be fetched. To write a new issue, use jira-draft. Triggers on phrases like 'CBRD-1234 내용 가져와', '이 이슈 참고해서 작업하자'."
 argument-hint: "<ISSUE-KEY> [ISSUE-KEY...] [-o out-dir]"
 allowed-tools:
   - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/fetch_jira.sh *)"
@@ -33,19 +33,13 @@ The helper clones/syncs the tool if needed, resolves credentials (env → the to
 
 **Output directory**: defaults to `./jira` (relative to the current working directory). If the user names a different location (e.g. "docs/tickets 에 받아줘", "save to ~/jira-issues"), pass it with `-o <dir>`: relative paths resolve against the current directory, absolute paths are used as-is.
 
-### 접근 범위와 한계 (실측)
+### Access (measured 2026-11-09)
 
-이 도구가 읽을 수 있는 것은 **공개(익명 열람 가능) 프로젝트**뿐이다: CBRD, TOOLS, APIS 등은 정상 다운로드된다.
+`jira.cubrid.org` now serves https directly and redirects http to https, so the login in `JIRA_USER` / `JIRA_PASSWORD` reaches the server: every project the account can open downloads, internal ones such as CUBRIDQA included. Before 2026-11 the server redirected https to http, `requests` dropped the login on that redirect, and only public projects (CBRD, TOOLS, APIS) could be read; notes written then may still say so.
 
-**내부 전용 프로젝트(CUBRIDQA)는 지원하지 않는다.** `HTTP 401`로 실패하며, 그 이슈는 브라우저로 열어서 확인해야 한다. 사용자가 CUBRIDQA 키나 URL을 주면 받아오려 시도하지 말고 이 제약을 알려준다.
-
-이유(2026-07-25 실측): `jira.cubrid.org`가 https 요청을 http로 302 리다이렉트하는데, `requests`는 스킴이 바뀌면 `Authorization` 헤더를 제거한다. 그래서 모든 요청이 익명으로 나가고, 익명에 공개된 프로젝트만 읽힌다. 리다이렉트를 피해 http로 직접 보내면 인증이 전달되지만 서버가 `X-Seraph-LoginReason: AUTHENTICATED_FAILED`로 자격증명을 거부한다 (구버전 Jira라 Personal Access Token도 없다).
-
-따라서:
-
-- **`JIRA_URL`을 `http://…`로 바꾸지 말 것.** 인증이 실제로 전달되면서 거부되어, 지금 되는 공개 프로젝트까지 401로 막힌다. `https://jira.cubrid.org` 유지가 유일하게 동작하는 조합이다.
-- `.envrc`의 `# TODO: paste a Personal Access Token …` 주석은 파일 생성 시의 안내문이고 값과 무관하다. **주석만 보고 자격증명 상태를 단정하지 말 것.**
-- 실패는 코드로 판단한다: `401` = 그 계정으로 읽을 수 없음(내부 전용 포함), `404` = 키 오타이거나 URL을 키로 잘못 넘긴 경우.
+- Keep `JIRA_URL=https://jira.cubrid.org`. The helper upgrades an `http://jira.cubrid.org` value, because the http-to-https redirect double-encodes query strings.
+- The `# TODO: paste a Personal Access Token …` comment in `.envrc` is a template note, not a credential status. This Jira version has no Personal Access Tokens; the account's username and password work.
+- Read failures by code: `401` = the account cannot open that issue; `404` = a wrong key, or a URL passed where a key was expected.
 
 ## Step 2: Load as context and work against it
 

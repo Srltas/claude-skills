@@ -16,7 +16,7 @@ Compress each issue into **one line** for the weekly-report spreadsheet: one lin
 
 ## Step 0: Prereq
 
-The **jira-fetch** skill, installed next to this one (this skill calls its helper). Its constraints apply: only publicly readable projects (CBRD, TOOLS, APIS, ...) can be read; internal-only projects such as CUBRIDQA fail with `HTTP 401`.
+The **jira-fetch** skill, installed next to this one (this skill calls its helper). Its constraints apply: it reads only what the configured CUBRID account can open, and an issue it cannot open fails with `HTTP 401`.
 
 ## Step 1: Parse the keys
 
@@ -57,7 +57,7 @@ Print the lines as one plain block in input order, nothing else interleaved, so 
 Then, if any key could not be read, list those separately with the reason and what would unblock them:
 
 ```
-읽지 못함: CUBRIDQA-1509 (내부 전용 프로젝트, 내용을 알려주시면 그 줄만 채웁니다)
+읽지 못함: CUBRIDQA-1509 (이 계정으로 열람할 수 없음, 내용을 알려주시면 그 줄만 채웁니다)
 ```
 
 Do not invent a line for an issue you could not read, and do not guess from the key alone.
