@@ -57,6 +57,10 @@ if [ ! -d "$TOOL_DIR/.git" ]; then
   echo "· cloning jira-to-md-downloader → $TOOL_DIR" >&2
   mkdir -p "$(dirname "$TOOL_DIR")"
   git clone --depth 1 "$TOOL_REPO" "$TOOL_DIR"
+else
+  # pick up tool changes (e.g. comments in the output) on every machine
+  git -C "$TOOL_DIR" pull --ff-only --quiet 2>/dev/null \
+    || echo "· could not update $TOOL_DIR; using the copy on disk" >&2
 fi
 ( cd "$TOOL_DIR" && uv sync --quiet )
 

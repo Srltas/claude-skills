@@ -1,6 +1,6 @@
 ---
 name: jira-fetch
-description: "Fetch CUBRID Jira issues as Markdown and load them as working context. Use it whenever a key like CBRD-1234 or a jira.cubrid.org link comes up and the issue content matters. Reads every project the CUBRID account can open, CUBRIDQA included; Atlassian Cloud (HHH) cannot be fetched. To write a new issue, use jira-draft. Triggers on phrases like 'CBRD-1234 내용 가져와', '이 이슈 참고해서 작업하자'."
+description: "Fetch CUBRID Jira issues, description and comments, as Markdown and load them as working context. Use it whenever a key like CBRD-1234 or a jira.cubrid.org link comes up and the issue content matters. Reads every project the CUBRID account can open, CUBRIDQA included; Atlassian Cloud (HHH) cannot be fetched. To write a new issue, use jira-draft. Triggers on phrases like 'CBRD-1234 내용 가져와', '이 이슈 참고해서 작업하자'."
 argument-hint: "<ISSUE-KEY> [ISSUE-KEY...] [-o out-dir]"
 allowed-tools:
   - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/fetch_jira.sh *)"
@@ -8,7 +8,7 @@ allowed-tools:
 
 # Fetch a JIRA issue to local Markdown
 
-Turn a JIRA issue key into a local `<KEY>.md` (issue summary + description as GitHub-flavored Markdown) and load it as working context. Wraps **[Srltas/jira-to-md-downloader](https://github.com/Srltas/jira-to-md-downloader)** (Python + `uv`, converts the description with `pandoc`).
+Turn a JIRA issue key into a local `<KEY>.md` (summary, description, and every comment as GitHub-flavored Markdown) and load it as working context. Wraps **[Srltas/jira-to-md-downloader](https://github.com/Srltas/jira-to-md-downloader)** (Python + `uv`, converts the Jira markup with `pandoc`). The comments come last, under `## Comments`, one `### <author> · <time>` heading each, oldest first; a comment that is not public carries `· restricted to <role>` in its heading.
 
 ## Step 0: Prereqs (the helper does the setup)
 
@@ -43,4 +43,4 @@ The helper clones/syncs the tool if needed, resolves credentials (env → the to
 
 ## Step 2: Load as context and work against it
 
-Read each downloaded `<KEY>.md`, then give the user a short summary: 제목, 유형(버그/개선/작업), 핵심 요구사항, 제약. From then on, treat that file as the source of truth for the ticket while doing the actual work, and reference it (`jira/<KEY>.md`) in commits / PR / report as needed. Do not re-fetch an issue whose `.md` already exists unless the user asks to refresh it.
+Read each downloaded `<KEY>.md`, then give the user a short summary: 제목, 유형(버그/개선/작업), 핵심 요구사항, 제약, and when there are comments, where the discussion stands (the latest decisions or findings). From then on, treat that file as the source of truth for the ticket while doing the actual work, and reference it (`jira/<KEY>.md`) in commits / PR / report as needed. Do not quote a `restricted to <role>` comment in public text (upstream PRs, public repos). Do not re-fetch an issue whose `.md` already exists unless the user asks to refresh it or the newest comments matter.

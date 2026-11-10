@@ -28,11 +28,11 @@ From `$ARGUMENTS`, take every `PROJECT-NUMBER`. Accept commas or spaces, a paste
 bash ${CLAUDE_SKILL_DIR}/../jira-fetch/assets/fetch_jira.sh APIS-1111 TOOLS-4324 ...
 ```
 
-The helper takes many keys at once, so call it **once** for the whole list. It writes `./jira/<KEY>.md` (title as `# heading`, then the description). Skip any key whose `.md` already exists: do not re-fetch. A key that cannot be read is simply reported as missing, and the rest still succeed.
+The helper takes many keys at once, so call it **once** for the whole list. It writes `./jira/<KEY>.md` (title as `# heading`, the description, then a `## Comments` section). Skip any key whose `.md` already exists: do not re-fetch. A key that cannot be read is simply reported as missing, and the rest still succeed.
 
 ## Step 3: Write one line per issue
 
-Read each `<KEY>.md` and compress it. **The line answers "what is this issue", not "what did I do" or "what is its status".**
+Read each `<KEY>.md` up to its `## Comments` section and compress it (the line describes the issue, so the comments are not needed). **The line answers "what is this issue", not "what did I do" or "what is its status".**
 
 ```
 APIS-1088 JDBC 구버전 PROTOCOL 호환성 코드 제거
