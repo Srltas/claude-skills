@@ -502,7 +502,14 @@ def gha_triage(repo, pr, head, base, branch, failing):
         if len(r["shards"]) > 10:
             print(f"    ... and {len(r['shards'])-10} more failed shard(s)")
         if not mine:
-            if r["shards"]:
+            # sql_by_cci (gha-ci since 2026-11-06) counts its failures but prints no case lines
+            failed = sum(int(m.group(3)) for _, v in r["shards"] for m in [VERDICT.search(v)] if m)
+            if failed:
+                print(f"  shard가 케이스 {failed}건 실패를 보고했지만 로그에 케이스별 결과가 없다(sql_by_cci는 로그에 찍지 않는다)."
+                      " 실패 케이스는 사내 결과 서버에서 볼 것:")
+                for name, _ in r["shards"][:10]:
+                    print(f"    {ARTIFACTS}/runs/{run}/{suite}/shard/{name.split()[-1]}/test-results/")
+            elif r["shards"]:
                 print("  shard가 실패했는데 실패한 케이스가 없다: 케이스 누락·파드 종료 같은 테스트 외 원인이다. 위 verdict 줄과 run 로그를 볼 것.")
                 print(f"  못 돌린 케이스는 PR에 `/run rerun {run}` 코멘트로 다시 돌릴 수 있다.")
             else:

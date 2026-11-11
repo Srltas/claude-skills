@@ -34,6 +34,7 @@ gha-ci details that change the answer:
 - `/run rerun <run-id>` re-runs that run's failures (plus TCs changed since) and **reuses the build of the same SHA**, so it cannot clear a failure caused by a stale base. Only a base update (a new SHA, a new build) followed by `/run all` can.
 - The nightly runs each develop commit once, so a case that fails only now and then can pass there and look 고유. For a case develop does not explain (it passes at the base, or develop has no verdict), the script reads other PRs' failed runs of the last 3 days, at most 40, newest first, and stops once every such case has turned up. A run that failed more than 3 of the suite's shards is left out: that PR broke something, which says nothing about flakiness. A case newer develop passes is not looked up, because PRs on older bases fail it too: that is a stale base, not flakiness.
 - The failure diff exists only in the `collect` job's step summary (the API does not expose it) and in each shard's JUnit XML on the internal artifact server `http://192.168.1.48:30080`. For 고유 cases the script tries that server; when it is unreachable, it prints the link, and the diff is on the run page's Summary.
+- `sql_by_cci` (in gha-ci since 2026-11-06) prints only its shard's verdict line, no case lines. Its failed cases exist only on that server, so the script reports the count and the shard's link.
 
 Re-running anything needs a token (CircleCI) or a PR comment (gha-ci), which is why this skill only reports.
 
