@@ -242,10 +242,18 @@ def job_log(repo, job, name=""):
     # An sql shard's log is ~25 MB raw, so it comes out of the run's compressed log zip, which
     # `gh run view` downloads once and caches. Any other job's (gate, plan, a shell or medium
     # shard: ~100 KB) is fetched alone, since GitHub can take 30 s to build a run's zip.
+    # gh 2.10x refuses to print an API response with terminal escape sequences (job logs carry
+    # ANSI colors) unless allowed; an older gh lacks the flag and prints the log as it is.
     cmd = (["gh", "run", "view", "--job", str(job), "--log", "--repo", repo] if name.startswith("shard sql ")
-           else ["gh", "api", f"repos/{repo}/actions/jobs/{job}/logs"])
+           else ["gh", "api", "--allow-escape-sequences", f"repos/{repo}/actions/jobs/{job}/logs"])
     p = subprocess.run(cmd, capture_output=True, text=True, errors="replace")
-    return p.stdout if p.returncode == 0 else None
+    if p.returncode and "unknown flag" in p.stderr and "--allow-escape-sequences" in cmd:
+        cmd.remove("--allow-escape-sequences")
+        p = subprocess.run(cmd, capture_output=True, text=True, errors="replace")
+    if p.returncode:
+        print(f"warning: cannot read the log of job {job} {name}: {p.stderr.strip()[:200]}", file=sys.stderr)
+        return None
+    return p.stdout
 
 
 @lru_cache(maxsize=None)
