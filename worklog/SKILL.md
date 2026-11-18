@@ -1,6 +1,6 @@
 ---
 name: worklog
-description: "Record issue work (a CUBRID Jira or Hibernate HHH key) as a Markdown note in the public work-docs repo, filled from the session (background, cause, change, verification, result) and committed. For work without an issue, use note. Triggers on phrases like '작업 기록 남겨줘', 'worklog 작성', '이 이슈 문서로 정리해서 커밋'."
+description: "Keep one issue's work record (a CUBRID Jira or Hibernate HHH key) as Markdown in the public work-docs repo: background, cause, change, verification, result, filled from the session, updated as the work moves, and committed. For a dated study or analysis note, even one about an issue, use note. Triggers on phrases like '작업 기록 남겨줘', 'worklog 작성', '이 이슈 문서로 정리해서 커밋'."
 argument-hint: "<ISSUE-KEY|topic> [slug] [--explainer]"
 allowed-tools:
   - "Bash(bash ${CLAUDE_SKILL_DIR}/../jira-fetch/assets/fetch_jira.sh *)"
@@ -10,7 +10,7 @@ allowed-tools:
 
 # Record work as a Markdown note (work-docs)
 
-Publish a per-issue work record to your **public** `work-docs` repo, so the reasoning behind a change is shareable and linkable from PRs. This complements (does not replace) the internal master DOCX: deep internal analysis stays in the DOCX; a clear, public-safe summary goes here.
+Publish a per-issue work record to your **public** `work-docs` repo, so the reasoning behind a change is shareable and linkable from PRs. One record per issue, updated as the work moves on; studies and analyses done along the way go to **note**, which may name the issue. This complements (does not replace) the internal master DOCX: deep internal analysis stays in the DOCX; a clear, public-safe summary goes here.
 
 ## Step 0: Prereqs
 

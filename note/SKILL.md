@@ -1,6 +1,6 @@
 ---
 name: note
-description: "Record an exploration note (PoC, review, code analysis, or other work without a Jira issue) as Markdown in the public work-docs repo, filled from the session and committed. For issue work, use worklog; for a Word report, use report. Triggers on phrases like '노트로 남겨줘', '분석 내용 기록해두자', 'PoC 노트 작성'."
+description: "Record a dated study or analysis note (PoC, review, code analysis, how something works) as Markdown in the public work-docs repo, filled from the session and committed; it may be about a Jira issue. For an issue's own work record (cause, change, verification), use worklog; for a Word report, use report. Triggers on phrases like '노트로 남겨줘', '분석 내용 기록해두자', 'PoC 노트 작성'."
 argument-hint: "<category> <slug>"
 allowed-tools:
   - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/new_note.sh *)"
@@ -9,7 +9,7 @@ allowed-tools:
 
 # Record an exploration note (work-docs)
 
-For work that has **no JIRA issue**: PoC, 검토(review), 코드 분석, and the like. Issue-keyed work goes through the **worklog** skill instead. Both write to the same public `work-docs` repo, side by side (issue records in uppercase-key folders, notes in lowercase category folders).
+For dated study and analysis notes: PoC, 검토(review), 코드 분석, how something works. A note may be about a Jira issue (name it in `관련`); the issue's own work record (cause, change, verification) goes through the **worklog** skill instead. Both write to the same public `work-docs` repo, side by side (issue records in uppercase-key folders, notes in lowercase category folders).
 
 ## Step 0: Prereqs
 
