@@ -27,8 +27,8 @@ My personal collection of [Claude Code](https://www.claude.com/product/claude-co
 | `review-triage` | Fetch your PR's review comments (human + bot), judge each against the real code, and draft a Korean summary + fix plan (valid) or reasoned reply (not valid); analysis only |
 | `ci-check` | Triage a CUBRID PR's CI: classify each failing test as 공통 / flaky / 고유 (CircleCI against other PRs' runs, gha-ci against develop's nightly verdicts at the PR's base and newer, then other PRs' recent runs), report base staleness, and say whether to re-run, update the base, or investigate |
 | `weekly-report` | (`/weekly-report` only, manual) Turn a list of JIRA issue keys into one short Korean line per issue (via jira-fetch), ready to paste into the weekly-report sheet |
-| `worklog` | Record issue work as a Markdown note in your public `work-docs` repo (`<KEY>/<KEY>-<slug>.md`), a shareable PR-linkable trail that complements the internal master DOCX |
-| `note` | Record a non-issue exploration note (PoC, review, code analysis) in the public `work-docs` repo (`<category>/<YYYY-MM-DD>-<slug>.md`) |
+| `worklog` | Record issue work as a Markdown note in your public `work-docs` repo (`<KEY>/<KEY>-<slug>.md`), a shareable PR-linkable trail that complements the internal master DOCX. `--explainer` starts a figure-led note on an API or protocol change. Figures: SVG packet layouts and byte tables from measured traffic (`svgfig.py`, `tcp_log_proxy.py`), Mermaid flows, all render-checked (`render_check.sh`) |
+| `note` | Record a non-issue exploration note (PoC, review, code analysis) in the public `work-docs` repo (`<category>/<YYYY-MM-DD>-<slug>.md`), with figures drawn and checked the worklog way |
 
 ## Naming convention
 

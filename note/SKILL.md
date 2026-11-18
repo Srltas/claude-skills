@@ -4,6 +4,7 @@ description: "Record an exploration note (PoC, review, code analysis, or other w
 argument-hint: "<category> <slug>"
 allowed-tools:
   - "Bash(bash ${CLAUDE_SKILL_DIR}/assets/new_note.sh *)"
+  - "Bash(bash ${CLAUDE_SKILL_DIR}/../worklog/assets/render_check.sh *)"
 ---
 
 # Record an exploration note (work-docs)
@@ -54,8 +55,8 @@ Complete each section: 요약 / 목적 / 배경 / 범위·방법 / 발견·관�
 - 목적·배경·결론은 2~3문장 짧은 서술, 방법·발견·다음 단계의 나열은 **개조식 불릿**.
 - 데이터·비교·수치는 **표**로, 코드·SQL·로그는 **코드블록**으로 (문장으로 풀지 않기).
 - **한 불릿에는 한 사실만**: `현재 → 목표`를 한 문장에 욱여넣지 말고 표의 두 열로. 클래스·파일 이름을 넷 넘게 쉼표로 잇지 말고, 표로 분리하거나 **기준 + 개수**로 압축한다 (예: "`Wrapper`를 구현하는 7개 클래스").
-- 흐름·구조·관계·시퀀스는 **Mermaid 다이어그램**(GitHub가 자동 렌더하는 `mermaid` 코드블록)으로 적극 표현: `flowchart`(처리·분기 흐름), `sequenceDiagram`(호출/상호작용), `erDiagram`(스키마·테이블 관계), `classDiagram`/`stateDiagram`(구조·상태 전이). 이해를 돕는 곳에만, 노드는 간결하게(대략 10개 이하). 노드가 4개를 넘으면 `flowchart TB`(세로)가 폭에 맞아 읽기 좋다.
-  - 복잡한 도식은 커밋 전에 한 번 렌더해 눈으로 확인한다(문법 오류·어색한 배치 예방). 예: `.mmd`로 저장 후 `curl -sf -X POST "${KROKI_URL:-https://kroki.io}/mermaid/png" -H 'Content-Type: text/plain' --data-binary @diagram.mmd -o /tmp/d.png` 로 렌더해 이미지를 확인하고, 이상하면 고친 뒤 다시 렌더한다. 최종 문서에는 `mermaid` 코드블록을 그대로 둔다(GitHub가 자동 렌더).
+- **Use figures generously**, the same way the worklog skill does: follow `${CLAUDE_SKILL_DIR}/../worklog/references/figures.md`. Layouts, byte tables, before/after grids and version matrices are SVG files drawn with `${CLAUDE_SKILL_DIR}/../worklog/assets/svgfig.py` into `<category>/img/<slug>-<figure>.svg`; flows, sequences and decisions are `mermaid` blocks; bytes and values come from a real run (`${CLAUDE_SKILL_DIR}/../worklog/assets/tcp_log_proxy.py` for protocol traffic).
+- **Check every figure before the commit**: `bash ${CLAUDE_SKILL_DIR}/../worklog/assets/render_check.sh <note.md>`, then read every PNG it prints and fix clipped or overlapping text.
 - em-dash(`—`)는 쓰지 않는다. 쉼표·콜론·괄호·마침표로 대체.
 
 **The repo is PUBLIC**: no credentials, internal hostnames, local absolute paths, or internal-only analysis. Keep sensitive detail in the master DOCX and link out.
@@ -64,8 +65,8 @@ Complete each section: 요약 / 목적 / 배경 / 범위·방법 / 발견·관�
 
 ```bash
 REPO="${WORK_DOCS_REPO:-$HOME/Devel/work-docs}"
-git -C "$REPO" add "<category>/<YYYY-MM-DD>-<slug>.md"
+git -C "$REPO" add "<category>/<YYYY-MM-DD>-<slug>.md" "<category>/img/<slug>-"*.svg
 git -C "$REPO" commit -m "note(<category>): <short summary>"
 ```
 
-Give the user the local path and the public URL. Pushing is the user's responsibility.
+Add only this note's figures (drop the `img` path when it has none), never the figure script or a capture file. Give the user the local path and the public URL. Pushing is the user's responsibility.

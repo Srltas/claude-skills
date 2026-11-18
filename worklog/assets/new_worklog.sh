@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 # Scaffold a work-record markdown in the public work-docs repo from the template.
-#   new_worklog.sh <ISSUE-KEY|topic> [slug]
+#   new_worklog.sh <ISSUE-KEY|topic> [slug] [--explainer]
+# --explainer starts from the API or protocol change explainer template instead.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 REPO="${WORK_DOCS_REPO:-${WORKLOG_DOCS_REPO:-$HOME/Devel/work-docs}}"
 TEMPLATE="$HERE/worklog-template.md"
 
-KEY="${1:?usage: new_worklog.sh <ISSUE-KEY|topic> [slug]}"
+args=()
+for a in "$@"; do
+  if [ "$a" = "--explainer" ]; then TEMPLATE="$HERE/explainer-template.md"; else args+=("$a"); fi
+done
+set -- ${args[@]+"${args[@]}"}
+
+KEY="${1:?usage: new_worklog.sh <ISSUE-KEY|topic> [slug] [--explainer]}"
 SLUG="${2:-}"
 
 [ -d "$REPO/.git" ] || { echo "error: docs repo not found at $REPO — clone your public work-docs repo there, or set WORKLOG_DOCS_REPO." >&2; exit 2; }
